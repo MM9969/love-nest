@@ -628,7 +628,7 @@
       <div class="chat-messages" id="chatMessages">
         <!-- Girl Row (Avatar left, bubble right) -->
         <div class="chat-row girl-row">
-          <img src="images/girl-avatar.png" alt="girl" class="chat-avatar">
+          <img src="images/girl-avatar.gif" alt="girl" class="chat-avatar">
           <div class="chat-content">
             <div class="bubble girl-bubble" id="girlMessage">
               <span class="jumping-heart" id="girlHeart">♥</span>
@@ -645,7 +645,7 @@
             </div>
             <div class="bubble-time" id="boyTime">🇺🇸 --:--</div>
           </div>
-          <img src="images/boy-avatar.png" alt="boy" class="chat-avatar">
+          <img src="images/boy-avatar.gif" alt="boy" class="chat-avatar">
         </div>
       </div>
       
@@ -699,20 +699,15 @@
 
   function updateTimeProgress() {
     const now = new Date();
-    const cnTimeStr = now.toLocaleString('zh-CN', {
-      timeZone: 'Asia/Shanghai',
-      hour12: false
-    });
-    const cnDate = new Date(cnTimeStr);
-    
-    // Format time HH:MM:SS
-    const hours = String(cnDate.getHours()).padStart(2, '0');
-    const minutes = String(cnDate.getMinutes()).padStart(2, '0');
-    const seconds = String(cnDate.getSeconds()).padStart(2, '0');
-    digitalTime.textContent = `${hours}:${minutes}:${seconds}`;
+    // 用 Intl 拿中国时间各部分，避免 new Date(string) 解析失败
+    const fmt = (opt) => Number(new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Shanghai', ...opt }).format(now));
+    const hours = fmt({ hour: 'numeric', hour12: false });
+    const minutes = fmt({ minute: 'numeric' });
+    const seconds = fmt({ second: 'numeric' });
+    digitalTime.textContent = `${String(hours).padStart(2,'0')}:${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}`;
     
     // Calculate 24-hour progress percentage
-    const totalSeconds = cnDate.getHours() * 3600 + cnDate.getMinutes() * 60 + cnDate.getSeconds();
+    const totalSeconds = hours * 3600 + minutes * 60 + seconds;
     const percentage = (totalSeconds / 86400) * 100; // 86400 seconds in a day
     progressFill.style.width = percentage + '%';
   }
