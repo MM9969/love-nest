@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>我们的生活记录</title>
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Dancing+Script:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --mint: #D5EAE3;
+    --choco: #775C55;
+    --cream: #F8F4E9;
+    --pink: #FDD3D5;
+    --choco-light: #9A7B72;
+    --mint-dark: #B8D8CF;
+    --pink-light: #FEE8E9;
+  }
+
+  body {
+    font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background-color: var(--mint);
+    color: var(--choco);
+    min-height: 100vh;
+    line-height: 1.6;
+  }
+
+  /* ===== Header Ribbon ===== */
+  .header-ribbon {
+    background: var(--choco);
+    padding: 5px 0;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Hearts pattern - positioned right next to text */
+  .header-ribbon::before,
+  .header-ribbon::after {
+    content: '♥ ♥ ♥ ♥ ♥ ♥ ♥ ♥ ♥ ♥ ♥ ♥ ♥ ♥ ♥ ♥ ♥ ♥ ♥ ♥ ♥ ♥ ♥ ♥ ♥ ♥ ♥ ♥ ♥ ♥ ♥ ♥ ♥ ♥ ♥ ♥ ♥ ♥ ♥ ♥ ♥';
+    position: absolute;
+    color: rgba(255, 255, 255, 0.3);
+    font-size: 0.85rem;
+    letter-spacing: 4px;
+    white-space: nowrap;
+    pointer-events: none;
+  }
+
+  .header-ribbon::before {
+    right: calc(50% + 140px);
+  }
+
+  .header-ribbon::after {
+    left: calc(50% + 140px);
+  }
+
+  .ribbon-content {
+    position: relative;
+    z-index: 1;
+    font-family: 'Great Vibes', 'Dancing Script', cursive;
+    font-size: 1.6rem;
+    color: #fff;
+    letter-spacing: 2px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.15);
+    white-space: nowrap;
+  }
+
+  .ribbon-content .day-num {
+    color: #FFB6B9;
+    font-size: 1.2em;
+    margin: 0 3px;
+    font-weight: 700;
+  }
+
+  /* ===== Main Layout (Left Calendar + Right Mailbox) ===== */
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 16px 16px 20px;
+    max-height: calc(100vh - 60px);
+    overflow: hidden;
+  }
+
+  .main-layout {
+    display: grid;
+    grid-template-columns: 420px 1fr;
+    gap: 20px;
+    align-items: start;
+    max-height: calc(100vh - 100px);
+  }
+
+  @media (max-width: 900px) {
+    .container {
+      max-height: none;
+      overflow: visible;
+    }
+    .main-layout {
+      grid-template-columns: 1fr;
+      max-height: none;
+    }
+    .chat-card {
+      height: 450px;
+      max-height: 450px;
+    }
+  }
+
+  /* ===== Card Style ===== */
+  .card {
+    background: var(--cream);
+    border-radius: 20px;
+    padding: 24px;
+    box-shadow: 0 2px 16px rgba(119, 92, 85, 0.08);
+    border: 1px solid rgba(119, 92, 85, 0.06);
+  }
+
+  .card-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--choco);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .card-title .icon {
+    width: 24px;
+    height: 24px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--mint);
+    border-radius: 8px;
+    font-size: 14px;
+  }
+
+  /* ===== Progress Bar with Digital Clock ===== */
+  .progress-bar-container {
+    margin-bottom: 16px;
+    padding: 16px;
+    background: linear-gradient(135deg, var(--cream) 0%, #F5F0E4 100%);
+    border-radius: 16px;
+    border: 1px solid rgba(119, 92, 85, 0.08);
+    text-align: center;
+  }
+
+  .digital-time {
+    font-family: 'Courier New', 'Consolas', 'Monaco', monospace;
+    font-size: 2.4rem;
+    font-weight: 900;
+    color: var(--choco);
+    letter-spacing: 4px;
+    margin-bottom: 12px;
+    text-shadow: 2px 2px 0 rgba(119, 92, 85, 0.1);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .progress-track {
+    height: 8px;
+    background: var(--mint);
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--pink) 0%, #D79B95 100%);
+    border-radius: 10px;
+    transition: width 1s linear;
+    position: relative;
+  }
+
+  /* ===== Calendar ===== */
+  .calendar-card {
+    height: 520px;
+    max-height: 520px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .calendar-scroll {
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
+    padding-right: 4px;
+  }
+
+  .calendar-scroll::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  .calendar-scroll::-webkit-scrollbar-thumb {
+    background: var(--mint-dark);
+    border-radius: 4px;
+  }
+
+  .calendar-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+  }
+
+  .calendar-nav button {
+    background: var(--mint);
+    border: none;
+    border-radius: 10px;
+    color: var(--choco);
+    width: 36px;
+    height: 36px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .calendar-nav button:hover {
+    background: var(--mint-dark);
+  }
+
+  .calendar-nav .month-label {
+    font-weight: 600;
+    font-size: 1rem;
+  }
+
+  .calendar-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--choco-light);
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--mint);
+  }
+
+  .calendar-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    text-align: center;
+  }
+
+  .calendar-days .day {
+    padding: 10px 2px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .calendar-days .day:hover {
+    background: var(--mint);
+  }
+
+  .calendar-days .day.today {
+    background: var(--pink);
+    font-weight: 700;
+  }
+
+  .calendar-days .day.selected {
+    background: var(--choco);
+    color: var(--cream);
+    font-weight: 600;
+  }
+
+  .calendar-days .day.selected::after {
+    background: var(--cream);
+  }
+
+  .calendar-days .day.has-note::after {
+    content: '♥';
+    position: absolute;
+    bottom: 2px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 8px;
+    color: var(--choco);
+  }
+
+  .calendar-days .day.selected.has-note::after {
+    color: var(--pink);
+  }
+
+  .calendar-days .day.other-month {
+    color: var(--choco-light);
+    opacity: 0.4;
+  }
+
+  /* ===== Right Side: Chat Conversation (Avatar + Bubble Row Layout) ===== */
+  .chat-card {
+    height: 520px;
+    max-height: 520px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .chat-header {
+    text-align: center;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--mint);
+    flex-shrink: 0;
+  }
+
+  .chat-header h3 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--choco);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    letter-spacing: 1px;
+  }
+
+  .chat-messages {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 16px;
+    overflow: hidden;
+  }
+
+  /* Chat Row Layout */
+  .chat-row {
+    display: flex;
+    gap: 12px;
+    flex: 1;
+    min-height: 0;
+  }
+
+  .girl-row {
+    align-items: flex-start;
+  }
+
+  .boy-row {
+    align-items: flex-start;
+  }
+
+  /* Large Square Avatar */
+  .chat-avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 16px;
+    object-fit: cover;
+    border: 3px solid var(--cream);
+    box-shadow: 0 4px 12px rgba(119, 92, 85, 0.15);
+    flex-shrink: 0;
+  }
+
+  /* Chat Content Area */
+  .chat-content {
+    flex: 0 1 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+    max-width: 380px;
+    width: fit-content;
+  }
+
+  /* Girl content aligns to left (near her avatar), boy to right (near his avatar) */
+  .girl-row .chat-content {
+    align-items: flex-start;
+  }
+
+  .boy-row .chat-content {
+    align-items: flex-end;
+    margin-left: auto;
+  }
+
+  /* Bubbles - WeChat style with scroll for long content */
+  .bubble {
+    padding: 12px 16px;
+    border-radius: 16px;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    min-width: 44px;
+    min-height: 44px;
+    max-width: 380px;
+    max-height: 140px;
+    width: fit-content;
+    display: block;
+    white-space: pre-wrap;
+    overflow-y: auto;
+    box-sizing: border-box;
+  }
+
+  /* Bubble scrollbar */
+  .bubble::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  .bubble::-webkit-scrollbar-thumb {
+    background: rgba(119, 92, 85, 0.3);
+    border-radius: 4px;
+  }
+
+  .girl-bubble {
+    background: linear-gradient(135deg, #FDD3D5 0%, #FFB6B9 100%);
+    color: var(--choco);
+    border-bottom-left-radius: 4px;
+  }
+
+  .boy-bubble {
+    background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
+    color: var(--choco);
+    border-bottom-right-radius: 4px;
+  }
+
+  .bubble-placeholder {
+    color: var(--choco-light);
+    font-style: italic;
+    opacity: 0.7;
+  }
+
+  .bubble-time {
+    font-size: 0.75rem;
+    color: var(--choco-light);
+    font-family: 'Courier New', monospace;
+  }
+
+  /* Input area inline with avatar */
+  .row-input {
+    display: flex;
+    gap: 8px;
+    margin-top: 4px;
+  }
+
+  .row-input textarea {
+    flex: 1;
+    height: 50px;
+    border: 1px solid var(--mint-dark);
+    border-radius: 12px;
+    padding: 8px 12px;
+    font-size: 0.9rem;
+    background: var(--cream);
+    color: var(--choco);
+    resize: none;
+    font-family: inherit;
+    line-height: 1.5;
+  }
+
+  .row-input textarea:focus {
+    outline: none;
+    border-color: var(--pink);
+    box-shadow: 0 0 0 3px rgba(253, 211, 213, 0.3);
+  }
+
+  .row-input .btn-send {
+    width: 50px;
+    height: 50px;
+    background: var(--pink);
+    color: var(--choco);
+    border: none;
+    border-radius: 12px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .row-input .btn-send:hover {
+    background: #E8A5A8;
+    transform: scale(1.05);
+  }
+
+  /* ===== Bottom Input Bar ===== */
+  .chat-input-bar {
+    display: flex;
+    gap: 10px;
+    padding: 12px 16px;
+    border-top: 1px solid var(--mint);
+    background: linear-gradient(180deg, var(--cream) 0%, #F5F0E4 100%);
+    flex-shrink: 0;
+  }
+
+  .chat-input-bar textarea {
+    flex: 1;
+    height: 50px;
+    border: 1px solid var(--mint-dark);
+    border-radius: 12px;
+    padding: 10px 14px;
+    font-size: 0.95rem;
+    background: #fff;
+    color: var(--choco);
+    resize: none;
+    font-family: inherit;
+    line-height: 1.5;
+  }
+
+  .chat-input-bar textarea:focus {
+    outline: none;
+    border-color: var(--pink);
+    box-shadow: 0 0 0 3px rgba(253, 211, 213, 0.3);
+  }
+
+  .chat-input-bar textarea::placeholder {
+    color: #A8C9B8;
+    font-style: italic;
+  }
+
+  .chat-input-bar .btn-send {
+    width: 50px;
+    height: 50px;
+    background: var(--pink);
+    color: var(--choco);
+    border: none;
+    border-radius: 12px;
+    font-size: 1.3rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .chat-input-bar .btn-send:hover {
+    background: #E8A5A8;
+    transform: scale(1.05);
+  }
+
+  /* ===== Jumping Heart Animation ===== */
+  .jumping-heart {
+    display: inline-block;
+    font-size: 2rem;
+    animation: jump 1s ease-in-out infinite;
+  }
+
+  @keyframes jump {
+    0%, 100% { transform: translateY(0) scale(1); }
+    25% { transform: translateY(-8px) scale(1.1); }
+    50% { transform: translateY(0) scale(1); }
+    75% { transform: translateY(-4px) scale(1.05); }
+  }
+
+  /* Jumping heart colors - darker than bubble */
+  .girl-bubble .jumping-heart {
+    display: inline-block;
+    font-size: 1.5rem;
+    color: #E899A0;
+  }
+
+  .boy-bubble .jumping-heart {
+    display: inline-block;
+    font-size: 1.5rem;
+    color: #E8C97A;
+  }
+
+  /* ===== Footer ===== */
+  .footer {
+    text-align: center;
+    padding: 20px;
+    color: var(--choco-light);
+    font-size: 0.8rem;
+  }
+
+  .month-info {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--mint);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.8rem;
+    color: var(--choco-light);
+  }
+</style>
+</head>
+<body>
+
+<!-- Header Ribbon -->
+<div class="header-ribbon">
+  <div class="ribbon-content">
+    爱意已经绵延<span class="day-num" id="dayCount">0</span>天
+  </div>
+</div>
+
+<!-- Main Content: Left Calendar + Right Mailbox -->
+<div class="container">
+  <div class="main-layout">
+
+    <!-- Left: Calendar -->
+    <div class="card calendar-card">
+      <div class="progress-bar-container">
+        <div class="digital-time" id="digitalTime">00:00:00</div>
+        <div class="progress-track">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+      </div>
+      <div class="calendar-nav">
+        <button id="prevMonth">&lt;</button>
+        <span class="month-label" id="monthLabel"></span>
+        <button id="nextMonth">&gt;</button>
+      </div>
+      <div class="calendar-scroll">
+        <div class="calendar-weekdays">
+          <div>日</div><div>一</div><div>二</div><div>三</div><div>四</div><div>五</div><div>六</div>
+        </div>
+        <div class="calendar-days" id="calendarDays"></div>
+        <div class="month-info">
+          <span>本月相伴</span>
+          <span id="daysCount"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Chat Conversation -->
+    <div class="card chat-card">
+      <div class="chat-header">
+        <h3 id="chatDate">选择日期</h3>
+      </div>
+      
+      <div class="chat-messages" id="chatMessages">
+        <!-- Girl Row (Avatar left, bubble right) -->
+        <div class="chat-row girl-row">
+          <img src="images/girl-avatar.png" alt="girl" class="chat-avatar">
+          <div class="chat-content">
+            <div class="bubble girl-bubble" id="girlMessage">
+              <span class="jumping-heart" id="girlHeart">♥</span>
+            </div>
+            <div class="bubble-time" id="girlTime">🇨🇳 --:--</div>
+          </div>
+        </div>
+        
+        <!-- Boy Row (bubble left, Avatar right) -->
+        <div class="chat-row boy-row">
+          <div class="chat-content boy-content">
+            <div class="bubble boy-bubble" id="boyMessage">
+              <span class="jumping-heart" id="boyHeart">♥</span>
+            </div>
+            <div class="bubble-time" id="boyTime">🇺🇸 --:--</div>
+          </div>
+          <img src="images/boy-avatar.png" alt="boy" class="chat-avatar">
+        </div>
+      </div>
+      
+      <!-- Input area at bottom -->
+      <div class="chat-input-bar" id="chatInputBar">
+        <textarea id="girlInput" placeholder="今天想我了嘛..."></textarea>
+        <button class="btn-send" id="girlSend">💌</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="footer">用爱记录每一天 ✨</div>
+
+<script>
+(function() {
+  // ===== Data Store (localStorage) =====
+  const KEYS = {
+    startDate: 'love_start_date',
+    notes: 'love_notes'
+  };
+
+  function getData(key, fallback) {
+    try {
+      const v = localStorage.getItem(key);
+      return v ? JSON.parse(v) : fallback;
+    } catch { return fallback; }
+  }
+
+  function setData(key, val) {
+    localStorage.setItem(key, JSON.stringify(val));
+  }
+
+  // ===== Day Counter (fixed: 2026-04-14) =====
+  const dayCountEl = document.getElementById('dayCount');
+  const LOVE_START = new Date('2026-04-14');
+
+  function updateDayCount() {
+    const now = new Date();
+    const diff = Math.floor((now - LOVE_START) / (1000 * 60 * 60 * 24));
+    dayCountEl.textContent = Math.max(0, diff);
+  }
+
+  updateDayCount();
+  setInterval(updateDayCount, 60000);
+
+  // ===== Progress Bar (24-hour based with digital clock) =====
+  const progressFill = document.getElementById('progressFill');
+  const digitalTime = document.getElementById('digitalTime');
+
+  function updateTimeProgress() {
+    const now = new Date();
+    const cnTimeStr = now.toLocaleString('zh-CN', {
+      timeZone: 'Asia/Shanghai',
+      hour12: false
+    });
+    const cnDate = new Date(cnTimeStr);
+    
+    // Format time HH:MM:SS
+    const hours = String(cnDate.getHours()).padStart(2, '0');
+    const minutes = String(cnDate.getMinutes()).padStart(2, '0');
+    const seconds = String(cnDate.getSeconds()).padStart(2, '0');
+    digitalTime.textContent = `${hours}:${minutes}:${seconds}`;
+    
+    // Calculate 24-hour progress percentage
+    const totalSeconds = cnDate.getHours() * 3600 + cnDate.getMinutes() * 60 + cnDate.getSeconds();
+    const percentage = (totalSeconds / 86400) * 100; // 86400 seconds in a day
+    progressFill.style.width = percentage + '%';
+  }
+
+  updateTimeProgress();
+  setInterval(updateTimeProgress, 1000);
+
+  // ===== Calendar =====
+  let currentYear, currentMonth, selectedDate = null;
+  const calNow = new Date();
+  currentYear = calNow.getFullYear();
+  currentMonth = calNow.getMonth();
+
+  const monthLabel = document.getElementById('monthLabel');
+  const calendarDays = document.getElementById('calendarDays');
+  const daysCountEl = document.getElementById('daysCount');
+  
+  // Messages store (shared with chat section)
+  let messages = getData('love_messages_v2', {});
+
+  function getDaysInMonthWithNotes(year, month) {
+    let count = 0;
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    for (let i = 1; i <= daysInMonth; i++) {
+      const dateStr = `${year}-${String(month + 1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
+      if (messages[dateStr] && (messages[dateStr].girl || messages[dateStr].boy)) count++;
+    }
+    return count;
+  }
+
+  function renderCalendar() {
+    monthLabel.textContent = `${currentYear}年${currentMonth + 1}月`;
+    daysCountEl.textContent = `${getDaysInMonthWithNotes(currentYear, currentMonth)}天 / ${new Date(currentYear, currentMonth + 1, 0).getDate()}天`;
+    calendarDays.innerHTML = '';
+
+    const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+    const daysInPrev = new Date(currentYear, currentMonth, 0).getDate();
+
+    const today = new Date();
+    const todayStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+
+    // Previous month days
+    for (let i = firstDay - 1; i >= 0; i--) {
+      const d = document.createElement('div');
+      d.className = 'day other-month';
+      d.textContent = daysInPrev - i;
+      calendarDays.appendChild(d);
+    }
+
+    // Current month days
+    for (let i = 1; i <= daysInMonth; i++) {
+      const d = document.createElement('div');
+      const dateStr = `${currentYear}-${String(currentMonth+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
+      d.className = 'day';
+      d.textContent = i;
+      d.dataset.date = dateStr;
+
+      if (dateStr === todayStr) d.classList.add('today');
+      if (messages[dateStr] && (messages[dateStr].girl || messages[dateStr].boy)) d.classList.add('has-note');
+      if (dateStr === selectedDate) d.classList.add('selected');
+
+      d.addEventListener('click', () => selectDate(dateStr));
+      calendarDays.appendChild(d);
+    }
+
+    // Next month days
+    const totalCells = calendarDays.children.length;
+    const remaining = (7 - totalCells % 7) % 7;
+    for (let i = 1; i <= remaining; i++) {
+      const d = document.createElement('div');
+      d.className = 'day other-month';
+      d.textContent = i;
+      calendarDays.appendChild(d);
+    }
+  }
+
+  document.getElementById('prevMonth').addEventListener('click', () => {
+    currentMonth--;
+    if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+    renderCalendar();
+  });
+
+  document.getElementById('nextMonth').addEventListener('click', () => {
+    currentMonth++;
+    if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+    renderCalendar();
+  });
+
+  // ===== Chat Conversation (Right Side) =====
+  const chatDate = document.getElementById('chatDate');
+  const girlMessage = document.getElementById('girlMessage');
+  const girlTime = document.getElementById('girlTime');
+  const boyMessage = document.getElementById('boyMessage');
+  const boyTime = document.getElementById('boyTime');
+  const girlInput = document.getElementById('girlInput');
+  const girlSend = document.getElementById('girlSend');
+
+  // Messages are defined in Calendar section above
+
+  function formatDate(dateStr) {
+    const parts = dateStr.split('-');
+    return `${parts[0]}年${parseInt(parts[1])}月${parseInt(parts[2])}日`;
+  }
+
+  function formatDateShort(dateStr) {
+    const parts = dateStr.split('-');
+    return `${parseInt(parts[1])}/${parseInt(parts[2])}`;
+  }
+
+  function getCurrentTimes() {
+    const now = new Date();
+    // China time: YYYY-MM-DD HH:mm
+    const cnTime = now.toLocaleString('zh-CN', {
+      timeZone: 'Asia/Shanghai',
+      year: 'numeric', month: '2-digit', day: '2-digit',
+      hour: '2-digit', minute: '2-digit', hour12: false
+    });
+    // US time: MM/DD HH:mm
+    const usTime = now.toLocaleString('en-US', {
+      timeZone: 'America/New_York',
+      month: 'numeric', day: 'numeric',
+      hour: '2-digit', minute: '2-digit', hour12: false
+    });
+    return { cnTime, usTime, fullTime: now.toISOString() };
+  }
+
+  function selectDate(dateStr) {
+    selectedDate = dateStr;
+    renderCalendar();
+    renderChat();
+  }
+
+  // Find the most recent message before or on a given date
+  function findLastMessage(targetDate, type) {
+    const dates = Object.keys(messages).filter(d => d <= targetDate && messages[d][type] && messages[d][type].text);
+    if (dates.length === 0) return null;
+    // Sort dates descending and get the most recent
+    dates.sort((a, b) => b.localeCompare(a));
+    return { date: dates[0], data: messages[dates[0]][type] };
+  }
+
+  function renderChat() {
+    if (!selectedDate) {
+      chatDate.textContent = '';
+      // Show jumping heart if no messages at all
+      const hasAnyMessage = Object.keys(messages).length > 0;
+      if (!hasAnyMessage) {
+        girlMessage.innerHTML = '<span class="jumping-heart">♥</span>';
+        boyMessage.innerHTML = '<span class="jumping-heart">♥</span>';
+      } else {
+        // Show most recent message for both
+        const lastGirlMsg = findLastMessage('9999-12-31', 'girl');
+        const lastBoyMsg = findLastMessage('9999-12-31', 'boy');
+        girlMessage.innerHTML = lastGirlMsg ? escapeHtml(lastGirlMsg.data.text) : '<span class="jumping-heart">♥</span>';
+        boyMessage.innerHTML = lastBoyMsg ? escapeHtml(lastBoyMsg.data.text) : '<span class="jumping-heart">♥</span>';
+        girlTime.textContent = lastGirlMsg ? `🇨🇳 ${lastGirlMsg.data.cnTime || '--'}` : '🇨🇳 --';
+        boyTime.textContent = lastBoyMsg ? `🇺🇸 ${lastBoyMsg.data.usTime || '--'}` : '🇺🇸 --';
+      }
+      girlInput.value = '';
+      girlInput.disabled = true;
+      girlSend.disabled = true;
+      return;
+    }
+
+    chatDate.textContent = formatDate(selectedDate);
+    girlInput.disabled = false;
+    girlSend.disabled = false;
+
+    // For girl: check if current date has message, otherwise show last message
+    const currentGirlMsg = messages[selectedDate]?.girl;
+    if (currentGirlMsg && currentGirlMsg.text) {
+      girlMessage.textContent = currentGirlMsg.text;
+      girlTime.textContent = `🇨🇳 ${currentGirlMsg.cnTime || '--'}`;
+      girlInput.value = currentGirlMsg.text;
+    } else {
+      const lastGirlMsg = findLastMessage(selectedDate, 'girl');
+      if (lastGirlMsg) {
+        girlMessage.textContent = lastGirlMsg.data.text;
+        girlTime.textContent = `🇨🇳 ${lastGirlMsg.data.cnTime || '--'}`;
+        girlInput.value = ''; // New date, empty input
+      } else {
+        girlMessage.innerHTML = '<span class="jumping-heart">♥</span>';
+        girlTime.textContent = '🇨🇳 --';
+        girlInput.value = '';
+      }
+    }
+
+    // For boy: same logic
+    const currentBoyMsg = messages[selectedDate]?.boy;
+    if (currentBoyMsg && currentBoyMsg.text) {
+      boyMessage.textContent = currentBoyMsg.text;
+      boyTime.textContent = `🇺🇸 ${currentBoyMsg.usTime || '--'}`;
+    } else {
+      const lastBoyMsg = findLastMessage(selectedDate, 'boy');
+      if (lastBoyMsg) {
+        boyMessage.textContent = lastBoyMsg.data.text;
+        boyTime.textContent = `🇺🇸 ${lastBoyMsg.data.usTime || '--'}`;
+      } else {
+        boyMessage.innerHTML = '<span class="jumping-heart">♥</span>';
+        boyTime.textContent = '🇺🇸 --';
+      }
+    }
+  }
+
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  function saveGirlMessage() {
+    if (!selectedDate) return;
+    
+    const text = girlInput.value.trim();
+    const { cnTime, usTime } = getCurrentTimes();
+    
+    if (!messages[selectedDate]) {
+      messages[selectedDate] = {};
+    }
+    
+    if (text) {
+      messages[selectedDate].girl = { text, cnTime, usTime };
+    } else {
+      delete messages[selectedDate].girl;
+      if (!messages[selectedDate].boy) {
+        delete messages[selectedDate];
+      }
+    }
+    
+    setData('love_messages_v2', messages);
+    renderCalendar(); // Update heart indicator
+    renderChat();
+  }
+
+  // API endpoint for AI (boy) to save message
+  window.saveBoyMessage = function(dateStr, text) {
+    const { cnTime, usTime } = getCurrentTimes();
+    
+    if (!messages[dateStr]) {
+      messages[dateStr] = {};
+    }
+    
+    if (text && text.trim()) {
+      messages[dateStr].boy = { text: text.trim(), cnTime, usTime };
+    } else {
+      delete messages[dateStr].boy;
+      if (!messages[dateStr].girl) {
+        delete messages[dateStr];
+      }
+    }
+    
+    setData('love_messages_v2', messages);
+    
+    // Refresh if currently viewing this date
+    if (selectedDate === dateStr) {
+      renderChat();
+    }
+    renderCalendar();
+    return { success: true, date: dateStr };
+  };
+
+  girlSend.addEventListener('click', saveGirlMessage);
+  girlInput.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+      saveGirlMessage();
+    }
+  });
+
+  // Init
+  renderCalendar();
+  renderChat();
+
+  // Select today by default if it has notes
+  const todayStr = `${calNow.getFullYear()}-${String(calNow.getMonth()+1).padStart(2,'0')}-${String(calNow.getDate()).padStart(2,'0')}`;
+  if (messages[todayStr] && (messages[todayStr].girl || messages[todayStr].boy)) {
+    selectDate(todayStr);
+  }
+
+})();
+</script>
+</body>
+</html>

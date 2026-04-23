@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>我们的生活记录</title>
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Dancing+Script:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --mint: #D5EAE3;
+    --choco: #775C55;
+    --cream: #F8F4E9;
+    --pink: #FDD3D5;
+    --choco-light: #9A7B72;
+    --mint-dark: #B8D8CF;
+    --pink-light: #FEE8E9;
+  }
+
+  body {
+    font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background-color: var(--mint);
+    color: var(--choco);
+    min-height: 100vh;
+    line-height: 1.6;
+  }
+
+  /* ===== Header ===== */
+  .header {
+    background: linear-gradient(135deg, var(--mint) 0%, var(--mint-dark) 100%);
+    padding: 30px 20px 20px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .header::before {
+    content: '';
+    position: absolute;
+    top: -30px; left: -30px;
+    width: 120px; height: 120px;
+    background: var(--pink);
+    border-radius: 50%;
+    opacity: 0.4;
+  }
+
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: -20px; right: -20px;
+    width: 100px; height: 100px;
+    background: var(--cream);
+    border-radius: 50%;
+    opacity: 0.5;
+  }
+
+  .header h1 {
+    font-family: 'Great Vibes', 'Dancing Script', cursive;
+    font-size: 2.6rem;
+    color: var(--choco);
+    position: relative;
+    z-index: 1;
+    margin-bottom: 0;
+    letter-spacing: 2px;
+  }
+
+  .header h1 .heart {
+    color: var(--pink);
+    display: inline-block;
+    animation: heartbeat 1.5s ease-in-out infinite;
+  }
+
+  .header h1 .label-text {
+    letter-spacing: 4px;
+  }
+
+  .header h1 .day-num {
+    color: #D79B95;
+    font-size: 1.15em;
+    margin: 0 6px;
+    letter-spacing: 2px;
+  }
+
+  @keyframes heartbeat {
+    0%, 100% { transform: scale(1); }
+    15% { transform: scale(1.15); }
+    30% { transform: scale(1); }
+    45% { transform: scale(1.1); }
+  }
+
+  .start-date-line {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    margin-top: 6px;
+    font-size: 0.9rem;
+    color: var(--choco-light);
+    opacity: 0.75;
+    letter-spacing: 1px;
+    font-weight: 500;
+  }
+
+  /* ===== Timezone Display ===== */
+  .timezone-row {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    justify-content: center;
+    gap: 36px;
+    margin-top: 2px;
+    font-size: 0.9rem;
+    color: var(--choco-light);
+    opacity: 0.55;
+    font-weight: 500;
+  }
+
+  .tz-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Segoe UI', 'PingFang SC', sans-serif;
+    letter-spacing: 1px;
+  }
+
+  .tz-flag {
+    font-size: 1rem;
+  }
+
+  .tz-time {
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    color: var(--choco-light);
+    opacity: 1;
+  }
+
+  /* ===== Main Layout (Left Calendar + Right Mailbox) ===== */
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px 16px 40px;
+  }
+
+  .main-layout {
+    display: grid;
+    grid-template-columns: 420px 1fr;
+    gap: 24px;
+    align-items: start;
+  }
+
+  @media (max-width: 900px) {
+    .main-layout {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* ===== Card Style ===== */
+  .card {
+    background: var(--cream);
+    border-radius: 20px;
+    padding: 24px;
+    box-shadow: 0 2px 16px rgba(119, 92, 85, 0.08);
+    border: 1px solid rgba(119, 92, 85, 0.06);
+  }
+
+  .card-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--choco);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .card-title .icon {
+    width: 24px;
+    height: 24px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--mint);
+    border-radius: 8px;
+    font-size: 14px;
+  }
+
+  /* ===== Calendar ===== */
+  .calendar-card {
+    position: sticky;
+    top: 20px;
+  }
+
+  .calendar-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+  }
+
+  .calendar-nav button {
+    background: var(--mint);
+    border: none;
+    border-radius: 10px;
+    color: var(--choco);
+    width: 36px;
+    height: 36px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .calendar-nav button:hover {
+    background: var(--mint-dark);
+  }
+
+  .calendar-nav .month-label {
+    font-weight: 600;
+    font-size: 1rem;
+  }
+
+  .calendar-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--choco-light);
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--mint);
+  }
+
+  .calendar-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    text-align: center;
+  }
+
+  .calendar-days .day {
+    padding: 10px 2px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .calendar-days .day:hover {
+    background: var(--mint);
+  }
+
+  .calendar-days .day.today {
+    background: var(--pink);
+    font-weight: 700;
+  }
+
+  .calendar-days .day.selected {
+    background: var(--choco);
+    color: var(--cream);
+    font-weight: 600;
+  }
+
+  .calendar-days .day.selected::after {
+    background: var(--cream);
+  }
+
+  .calendar-days .day.has-note::after {
+    content: '♥';
+    position: absolute;
+    bottom: 2px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 8px;
+    color: var(--choco);
+  }
+
+  .calendar-days .day.selected.has-note::after {
+    color: var(--pink);
+  }
+
+  .calendar-days .day.other-month {
+    color: var(--choco-light);
+    opacity: 0.4;
+  }
+
+  /* ===== Right Side: Mailbox ===== */
+  .mailbox-card {
+    min-height: 500px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .mailbox-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--mint);
+  }
+
+  .mailbox-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--choco);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .mailbox-title .icon {
+    width: 28px;
+    height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--pink);
+    border-radius: 8px;
+    font-size: 14px;
+  }
+
+  .mailbox-date {
+    font-size: 0.85rem;
+    color: var(--choco-light);
+    font-weight: 400;
+  }
+
+  .message-editor {
+    margin-bottom: 16px;
+  }
+
+  .message-editor textarea {
+    width: 100%;
+    min-height: 100px;
+    border: 1px solid var(--mint-dark);
+    border-radius: 14px;
+    padding: 14px;
+    font-size: 0.95rem;
+    background: var(--cream);
+    color: var(--choco);
+    resize: vertical;
+    font-family: inherit;
+    line-height: 1.6;
+  }
+
+  .message-editor textarea:focus {
+    outline: none;
+    border-color: var(--choco-light);
+    box-shadow: 0 0 0 3px rgba(119, 92, 85, 0.08);
+  }
+
+  .message-editor textarea::placeholder {
+    color: var(--choco-light);
+  }
+
+  .editor-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 10px;
+  }
+
+  .editor-actions button {
+    padding: 10px 24px;
+    border-radius: 12px;
+    border: none;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-save {
+    background: var(--choco);
+    color: var(--cream);
+  }
+
+  .btn-save:hover {
+    background: var(--choco-light);
+  }
+
+  .btn-delete {
+    background: var(--pink);
+    color: var(--choco);
+  }
+
+  .btn-delete:hover {
+    background: var(--pink-light);
+  }
+
+  .btn-delete:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .message-display {
+    flex: 1;
+    background: var(--mint);
+    border-radius: 16px;
+    padding: 20px;
+    position: relative;
+  }
+
+  .message-display.empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .message-display.empty::before {
+    content: '📭';
+    font-size: 4rem;
+    opacity: 0.3;
+    position: absolute;
+  }
+
+  .message-content {
+    font-size: 1rem;
+    color: var(--choco);
+    line-height: 1.8;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+
+  .message-empty-text {
+    text-align: center;
+    color: var(--choco-light);
+    font-size: 0.95rem;
+    z-index: 1;
+    position: relative;
+  }
+
+  .message-empty-text .hint {
+    font-size: 0.8rem;
+    margin-top: 8px;
+    opacity: 0.7;
+  }
+
+  /* ===== Date List ===== */
+  .date-list {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--mint);
+  }
+
+  .date-list-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--choco);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .date-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .date-chip {
+    background: var(--mint);
+    border: none;
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 0.8rem;
+    color: var(--choco);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .date-chip:hover {
+    background: var(--mint-dark);
+  }
+
+  .date-chip.active {
+    background: var(--choco);
+    color: var(--cream);
+  }
+
+  .date-chip .delete {
+    margin-left: 6px;
+    opacity: 0.5;
+    cursor: pointer;
+  }
+
+  .date-chip:hover .delete {
+    opacity: 1;
+  }
+
+  /* ===== Footer ===== */
+  .footer {
+    text-align: center;
+    padding: 20px;
+    color: var(--choco-light);
+    font-size: 0.8rem;
+  }
+
+  .month-info {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--mint);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.8rem;
+    color: var(--choco-light);
+  }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <h1><span class="heart">♥</span> <span class="label-text">爱意已经绵延</span> <span class="day-num" id="dayCount">0</span> <span class="label-text">天</span> <span class="heart">♥</span></h1>
+  <div class="timezone-row">
+    <div class="tz-item"><span class="tz-flag">🇺🇸</span> <span class="tz-time" id="usTime"></span></div>
+    <div class="tz-item"><span class="tz-flag">🇨🇳</span> <span class="tz-time" id="cnTime"></span></div>
+  </div>
+  <div class="start-date-line">2026年4月19日</div>
+</div>
+
+<!-- Main Content: Left Calendar + Right Mailbox -->
+<div class="container">
+  <div class="main-layout">
+
+    <!-- Left: Calendar -->
+    <div class="card calendar-card">
+      <div class="card-title">
+        <span class="icon">📅</span> 日历
+      </div>
+      <div class="calendar-nav">
+        <button id="prevMonth">&lt;</button>
+        <span class="month-label" id="monthLabel"></span>
+        <button id="nextMonth">&gt;</button>
+      </div>
+      <div class="calendar-weekdays">
+        <div>日</div><div>一</div><div>二</div><div>三</div><div>四</div><div>五</div><div>六</div>
+      </div>
+      <div class="calendar-days" id="calendarDays"></div>
+      <div class="month-info">
+        <span>本月相伴</span>
+        <span id="daysCount"></span>
+      </div>
+    </div>
+
+    <!-- Right: Mailbox -->
+    <div class="card mailbox-card">
+      <div class="mailbox-header">
+        <div class="mailbox-title">
+          <span class="icon">�</span> 
+          <span id="mailboxDate">选择日期</span>
+        </div>
+        <span class="mailbox-date" id="mailboxDateDisplay"></span>
+      </div>
+      
+      <div class="message-editor" id="editorArea">
+        <textarea id="noteInput" placeholder="点击日历上的日期，写下这一天的心情..."></textarea>
+        <div class="editor-actions">
+          <button class="btn-delete" id="deleteBtn" disabled>删除</button>
+          <button class="btn-save" id="saveBtn">保存</button>
+        </div>
+      </div>
+
+      <div class="date-list" id="dateList">
+        <div class="date-list-title">📮 已记录的日子</div>
+        <div class="date-items" id="dateItems"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="footer">用爱记录每一天 ✨</div>
+
+<script>
+(function() {
+  // ===== Data Store (localStorage) =====
+  const KEYS = {
+    startDate: 'love_start_date',
+    notes: 'love_notes'
+  };
+
+  function getData(key, fallback) {
+    try {
+      const v = localStorage.getItem(key);
+      return v ? JSON.parse(v) : fallback;
+    } catch { return fallback; }
+  }
+
+  function setData(key, val) {
+    localStorage.setItem(key, JSON.stringify(val));
+  }
+
+  // ===== Day Counter (fixed: 2026-04-19) =====
+  const dayCountEl = document.getElementById('dayCount');
+  const LOVE_START = new Date('2026-04-19');
+
+  function updateDayCount() {
+    const now = new Date();
+    const diff = Math.floor((now - LOVE_START) / (1000 * 60 * 60 * 24));
+    dayCountEl.textContent = Math.max(0, diff);
+  }
+
+  updateDayCount();
+  setInterval(updateDayCount, 60000);
+
+  // ===== Dual Timezone Clock =====
+  const usTimeEl = document.getElementById('usTime');
+  const cnTimeEl = document.getElementById('cnTime');
+
+  function updateClocks() {
+    const t = new Date();
+    const usOpts = { timeZone: 'America/New_York', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+    const cnOpts = { timeZone: 'Asia/Shanghai', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+
+    usTimeEl.textContent = t.toLocaleString('en-US', usOpts);
+    cnTimeEl.textContent = t.toLocaleString('zh-CN', cnOpts);
+  }
+
+  updateClocks();
+  setInterval(updateClocks, 1000);
+
+  // ===== Calendar =====
+  let currentYear, currentMonth, selectedDate = null;
+  const calNow = new Date();
+  currentYear = calNow.getFullYear();
+  currentMonth = calNow.getMonth();
+
+  const monthLabel = document.getElementById('monthLabel');
+  const calendarDays = document.getElementById('calendarDays');
+  const daysCountEl = document.getElementById('daysCount');
+  let notes = getData(KEYS.notes, {});
+
+  function getDaysInMonthWithNotes(year, month) {
+    let count = 0;
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    for (let i = 1; i <= daysInMonth; i++) {
+      const dateStr = `${year}-${String(month + 1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
+      if (notes[dateStr]) count++;
+    }
+    return count;
+  }
+
+  function renderCalendar() {
+    monthLabel.textContent = `${currentYear}年${currentMonth + 1}月`;
+    daysCountEl.textContent = `${getDaysInMonthWithNotes(currentYear, currentMonth)}天 / ${new Date(currentYear, currentMonth + 1, 0).getDate()}天`;
+    calendarDays.innerHTML = '';
+
+    const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+    const daysInPrev = new Date(currentYear, currentMonth, 0).getDate();
+
+    const today = new Date();
+    const todayStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+
+    // Previous month days
+    for (let i = firstDay - 1; i >= 0; i--) {
+      const d = document.createElement('div');
+      d.className = 'day other-month';
+      d.textContent = daysInPrev - i;
+      calendarDays.appendChild(d);
+    }
+
+    // Current month days
+    for (let i = 1; i <= daysInMonth; i++) {
+      const d = document.createElement('div');
+      const dateStr = `${currentYear}-${String(currentMonth+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
+      d.className = 'day';
+      d.textContent = i;
+      d.dataset.date = dateStr;
+
+      if (dateStr === todayStr) d.classList.add('today');
+      if (notes[dateStr]) d.classList.add('has-note');
+      if (dateStr === selectedDate) d.classList.add('selected');
+
+      d.addEventListener('click', () => selectDate(dateStr));
+      calendarDays.appendChild(d);
+    }
+
+    // Next month days
+    const totalCells = calendarDays.children.length;
+    const remaining = (7 - totalCells % 7) % 7;
+    for (let i = 1; i <= remaining; i++) {
+      const d = document.createElement('div');
+      d.className = 'day other-month';
+      d.textContent = i;
+      calendarDays.appendChild(d);
+    }
+  }
+
+  document.getElementById('prevMonth').addEventListener('click', () => {
+    currentMonth--;
+    if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+    renderCalendar();
+  });
+
+  document.getElementById('nextMonth').addEventListener('click', () => {
+    currentMonth++;
+    if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+    renderCalendar();
+  });
+
+  // ===== Mailbox (Right Side) =====
+  const mailboxDate = document.getElementById('mailboxDate');
+  const mailboxDateDisplay = document.getElementById('mailboxDateDisplay');
+  const noteInput = document.getElementById('noteInput');
+  const saveBtn = document.getElementById('saveBtn');
+  const deleteBtn = document.getElementById('deleteBtn');
+  const dateItems = document.getElementById('dateItems');
+
+  function formatDate(dateStr) {
+    const parts = dateStr.split('-');
+    return `${parts[0]}年${parseInt(parts[1])}月${parseInt(parts[2])}日`;
+  }
+
+  function formatDateShort(dateStr) {
+    const parts = dateStr.split('-');
+    return `${parseInt(parts[1])}/${parseInt(parts[2])}`;
+  }
+
+  function selectDate(dateStr) {
+    selectedDate = dateStr;
+    renderCalendar();
+    renderMailbox();
+    renderDateList();
+  }
+
+  function renderMailbox() {
+    if (!selectedDate) {
+      mailboxDate.textContent = '选择日期';
+      mailboxDateDisplay.textContent = '';
+      noteInput.value = '';
+      noteInput.placeholder = '点击日历上的日期，写下这一天的心情...';
+      deleteBtn.disabled = true;
+      return;
+    }
+
+    mailboxDate.textContent = formatDate(selectedDate);
+    mailboxDateDisplay.textContent = notes[selectedDate] ? '已保存' : '';
+    noteInput.value = notes[selectedDate] || '';
+    noteInput.placeholder = `写下${formatDate(selectedDate)}的心情...`;
+    deleteBtn.disabled = !notes[selectedDate];
+  }
+
+  function renderDateList() {
+    const sortedDates = Object.keys(notes).sort().reverse();
+    dateItems.innerHTML = '';
+
+    if (sortedDates.length === 0) {
+      dateItems.innerHTML = '<span style="color:var(--choco-light);font-size:0.85rem;">还没有记录的日子</span>';
+      return;
+    }
+
+    sortedDates.forEach(dateStr => {
+      const chip = document.createElement('button');
+      chip.className = 'date-chip' + (dateStr === selectedDate ? ' active' : '');
+      chip.innerHTML = `${formatDateShort(dateStr)}<span class="delete" data-date="${dateStr}">✕</span>`;
+      chip.addEventListener('click', (e) => {
+        if (e.target.classList.contains('delete')) {
+          deleteNote(dateStr);
+        } else {
+          // Check if date is in current view
+          const parts = dateStr.split('-');
+          const y = parseInt(parts[0]), m = parseInt(parts[1]) - 1;
+          if (y !== currentYear || m !== currentMonth) {
+            currentYear = y;
+            currentMonth = m;
+            renderCalendar();
+          }
+          selectDate(dateStr);
+        }
+      });
+      dateItems.appendChild(chip);
+    });
+  }
+
+  function saveNote() {
+    if (!selectedDate) return;
+    
+    const text = noteInput.value.trim();
+    if (text) {
+      notes[selectedDate] = text;
+    } else {
+      delete notes[selectedDate];
+    }
+    setData(KEYS.notes, notes);
+    renderCalendar();
+    renderMailbox();
+    renderDateList();
+  }
+
+  function deleteNote(dateStr) {
+    if (!dateStr && selectedDate) dateStr = selectedDate;
+    if (!dateStr) return;
+    
+    delete notes[dateStr];
+    setData(KEYS.notes, notes);
+    renderCalendar();
+    renderMailbox();
+    renderDateList();
+  }
+
+  saveBtn.addEventListener('click', saveNote);
+  deleteBtn.addEventListener('click', () => deleteNote());
+
+  noteInput.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+      saveNote();
+    }
+  });
+
+  // Init
+  renderCalendar();
+  renderMailbox();
+  renderDateList();
+
+  // Select today by default if it has notes
+  const todayStr = `${calNow.getFullYear()}-${String(calNow.getMonth()+1).padStart(2,'0')}-${String(calNow.getDate()).padStart(2,'0')}`;
+  if (notes[todayStr]) {
+    selectDate(todayStr);
+  }
+
+})();
+</script>
+</body>
+</html>
