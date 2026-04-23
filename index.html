@@ -663,11 +663,9 @@
 
 <script>
 (function() {
-  // ===== Data Store (localStorage) =====
-  const KEYS = {
-    startDate: 'love_start_date',
-    notes: 'love_notes'
-  };
+  // ===== Data Store (API + localStorage cache) =====
+  // ⬇⬇⬇ 部署后端后把这个地址改成你的实际域名 ⬇⬇⬇
+  const API_URL = 'https://love-nest-api.zeabur.app';
 
   function getData(key, fallback) {
     try {
@@ -678,6 +676,35 @@
 
   function setData(key, val) {
     localStorage.setItem(key, JSON.stringify(val));
+  }
+
+  // 从服务器拉取留言
+  async function fetchMessages() {
+    try {
+      const res = await fetch(`${API_URL}/messages`);
+      if (res.ok) {
+        const data = await res.json();
+        setData('love_messages_v2', data); // 缓存到本地
+        return data;
+      }
+    } catch (e) {
+      console.warn('API unavailable, using local cache:', e);
+    }
+    return getData('love_messages_v2', {});
+  }
+
+  // 发送留言到服务器
+  async function postMessage(date, role, text) {
+    const { cnTime, usTime } = getCurrentTimes();
+    try {
+      await fetch(`${API_URL}/messages`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ date, role, text, cnTime, usTime })
+      });
+    } catch (e) {
+      console.warn('API post failed:', e);
+    }
   }
 
   // ===== Day Counter (fixed: 2026-04-14) =====
@@ -726,6 +753,7 @@
   const daysCountEl = document.getElementById('daysCount');
   
   // Messages store (shared with chat section)
+  // 先用本地缓存快速渲染，然后从API拉最新数据
   let messages = getData('love_messages_v2', {});
 
   function getDaysInMonthWithNotes(year, month) {
@@ -939,7 +967,8 @@
     }
     
     setData('love_messages_v2', messages);
-    renderCalendar(); // Update heart indicator
+    postMessage(selectedDate, 'girl', text); // 同步到服务器
+    renderCalendar();
     renderChat();
   }
 
@@ -961,8 +990,8 @@
     }
     
     setData('love_messages_v2', messages);
+    postMessage(dateStr, 'boy', text); // 同步到服务器
     
-    // Refresh if currently viewing this date
     if (selectedDate === dateStr) {
       renderChat();
     }
@@ -977,7 +1006,7 @@
     }
   });
 
-  // Init
+  // Init - 先用缓存快速渲染
   renderCalendar();
   renderChat();
 
@@ -986,6 +1015,17 @@
   if (messages[todayStr] && (messages[todayStr].girl || messages[todayStr].boy)) {
     selectDate(todayStr);
   }
+
+  // 然后从服务器拉最新数据，刷新页面
+  fetchMessages().then(data => {
+    messages = data;
+    renderCalendar();
+    renderChat();
+    // 重新检查今天是否有留言
+    if (messages[todayStr] && (messages[todayStr].girl || messages[todayStr].boy)) {
+      selectDate(todayStr);
+    }
+  });
 
 })();
 </script>
