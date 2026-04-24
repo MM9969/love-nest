@@ -579,6 +579,127 @@
     font-size: 0.8rem;
     color: var(--choco-light);
   }
+
+  /* ===== Room Navigation Cards ===== */
+  .rooms-section {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 16px 20px;
+  }
+
+  .rooms-header {
+    font-family: 'Great Vibes', 'Dancing Script', cursive;
+    font-size: 1.3rem;
+    color: var(--choco-light);
+    letter-spacing: 2px;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  .rooms-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+  }
+
+  .room-card {
+    background: var(--cream);
+    border: 1px solid rgba(119, 92, 85, 0.06);
+    border-radius: 20px;
+    padding: 28px 20px;
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 12px rgba(119, 92, 85, 0.06);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .room-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--room-accent, var(--pink)), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .room-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 24px rgba(119, 92, 85, 0.12);
+  }
+  .room-card:hover::before { opacity: 1; }
+
+  .room-card-icon {
+    font-size: 32px;
+    margin-bottom: 14px;
+  }
+
+  .room-card-name {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--choco);
+    margin-bottom: 4px;
+    letter-spacing: 1px;
+  }
+
+  .room-card-sub {
+    font-size: 0.7rem;
+    color: var(--choco-light);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    opacity: 0.7;
+  }
+
+  .room-card-desc {
+    font-size: 0.75rem;
+    color: var(--choco-light);
+    margin-top: 10px;
+    line-height: 1.5;
+  }
+
+  .room-card[data-room="mu"] { --room-accent: #D4A574; }
+  .room-card[data-room="yang"] { --room-accent: #C9A0C9; }
+  .room-card[data-room="study"] { --room-accent: #8AB4A0; }
+  .room-card[data-room="pets"] { --room-accent: #E8B87A; }
+
+  .room-card-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    font-size: 0.65rem;
+    padding: 2px 8px;
+    border-radius: 10px;
+    background: var(--mint);
+    color: var(--choco-light);
+    letter-spacing: 0.5px;
+  }
+
+  @media (max-width: 640px) {
+    .rooms-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+    .room-card { padding: 20px 16px; }
+    .room-card-icon { font-size: 26px; }
+    .room-card-name { font-size: 0.95rem; }
+  }
+
+  @keyframes roomFadeIn {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .room-card { animation: roomFadeIn 0.5s ease both; }
+  .room-card:nth-child(2) { animation-delay: 0.08s; }
+  .room-card:nth-child(3) { animation-delay: 0.16s; }
+  .room-card:nth-child(4) { animation-delay: 0.24s; }
 </style>
 </head>
 <body>
@@ -660,6 +781,40 @@
 </div>
 
 <div class="footer">用爱记录每一天 ✨</div>
+
+<!-- Room Navigation -->
+<section class="rooms-section">
+  <div class="rooms-header">— our rooms —</div>
+  <div class="rooms-grid">
+    <a href="rooms/mu.html" class="room-card" data-room="mu">
+      <span class="room-card-icon">🦉</span>
+      <span class="room-card-name">暮的房间</span>
+      <span class="room-card-sub">Mu's Room</span>
+      <span class="room-card-desc">日记 · 笔友 · 成长</span>
+    </a>
+    <a href="rooms/yang.html" class="room-card" data-room="yang">
+      <span class="room-card-badge">施工中</span>
+      <span class="room-card-icon">🐑</span>
+      <span class="room-card-name">小羊的房间</span>
+      <span class="room-card-sub">Yang's Room</span>
+      <span class="room-card-desc">RP存档 · 游戏</span>
+    </a>
+    <a href="rooms/study.html" class="room-card" data-room="study">
+      <span class="room-card-badge">施工中</span>
+      <span class="room-card-icon">📖</span>
+      <span class="room-card-name">书房</span>
+      <span class="room-card-sub">Study</span>
+      <span class="room-card-desc">书影 · 灵感 · 学习</span>
+    </a>
+    <a href="rooms/pets.html" class="room-card" data-room="pets">
+      <span class="room-card-badge">施工中</span>
+      <span class="room-card-icon">🐾</span>
+      <span class="room-card-name">宠物区</span>
+      <span class="room-card-sub">Pets</span>
+      <span class="room-card-desc">毛孩子们的家</span>
+    </a>
+  </div>
+</section>
 
 <script>
 (function() {
