@@ -332,6 +332,195 @@
     line-height: 1.8;
   }
 
+  /* ===== Diary Toolbar: Search + Stamp ===== */
+  .diary-toolbar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    align-items: center;
+  }
+
+  .search-bar {
+    flex: 1;
+    position: relative;
+  }
+
+  .search-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 16px;
+    color: var(--text-muted);
+    pointer-events: none;
+  }
+
+  .search-bar input {
+    width: 100%;
+    padding: 10px 14px 10px 40px;
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius);
+    background: var(--card);
+    color: var(--text);
+    font-size: 13px;
+    font-family: var(--font-body);
+    outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s;
+  }
+  .search-bar input:focus {
+    border-color: var(--accent-light);
+    box-shadow: 0 0 0 3px rgba(196,149,106,0.1);
+  }
+  .search-bar input::placeholder {
+    color: var(--text-muted);
+    font-weight: 300;
+  }
+
+  .stamp-toggle {
+    width: 42px;
+    height: 42px;
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius);
+    background: var(--card);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+  .stamp-toggle:hover { border-color: var(--accent-light); }
+  .stamp-toggle.active {
+    background: var(--accent-light);
+    border-color: var(--accent);
+  }
+  .stamp-toggle svg { width: 18px; height: 18px; color: var(--text-secondary); }
+  .stamp-toggle.active svg { color: var(--text); }
+
+  .stamp-count {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    min-width: 18px;
+    height: 18px;
+    border-radius: 9px;
+    background: var(--accent);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+  }
+
+  /* ===== Stamp Calendar ===== */
+  .stamp-calendar {
+    background: var(--card);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    padding: 18px 20px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow-sm);
+    animation: fadeIn 0.3s ease;
+  }
+
+  .stamp-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+
+  .stamp-month {
+    font-family: var(--font-display);
+    font-size: 15px;
+    color: var(--text);
+    letter-spacing: 1px;
+  }
+
+  .stamp-nav {
+    width: 28px;
+    height: 28px;
+    border: none;
+    border-radius: 8px;
+    background: var(--bg);
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 12px;
+    transition: background 0.2s;
+  }
+  .stamp-nav:hover { background: var(--border-light); }
+
+  .stamp-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border-light);
+  }
+
+  .stamp-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 3px;
+    text-align: center;
+  }
+
+  .stamp-day {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    border-radius: 8px;
+    color: var(--text-secondary);
+    cursor: default;
+    position: relative;
+  }
+  .stamp-day.other { opacity: 0.3; }
+  .stamp-day.today { font-weight: 500; color: var(--accent); }
+  .stamp-day.has-diary {
+    background: var(--accent-light);
+    color: var(--text);
+    font-weight: 500;
+    cursor: pointer;
+  }
+  .stamp-day.has-diary:hover { background: var(--accent); color: #fff; }
+  .stamp-day.has-diary::after {
+    content: '✓';
+    position: absolute;
+    bottom: 1px;
+    right: 3px;
+    font-size: 7px;
+    color: var(--accent);
+  }
+  .stamp-day.has-diary:hover::after { color: #fff; }
+
+  .search-info {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+    padding: 8px 14px;
+    background: var(--bg-warm);
+    border-radius: var(--radius);
+    letter-spacing: 0.3px;
+  }
+  .search-info .highlight-count { color: var(--accent); font-weight: 500; }
+
+  /* Search highlight */
+  .diary-content mark {
+    background: rgba(196,149,106,0.25);
+    color: inherit;
+    padding: 1px 2px;
+    border-radius: 3px;
+  }
+
   /* ===== Loading & Animations ===== */
   @keyframes fadeIn {
     from { opacity: 0; transform: translateY(12px); }
@@ -403,7 +592,35 @@
 
   <!-- 日记 -->
   <section id="tab-diary" class="tab-panel active">
-    <div class="loading">正在翻开日记本</div>
+    <!-- 搜索栏 + 打卡日历 -->
+    <div class="diary-toolbar">
+      <div class="search-bar">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        <input type="text" id="diarySearch" placeholder="搜索日记关键词..." />
+      </div>
+      <button class="stamp-toggle" id="stampToggle" title="打卡日历">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+        <span class="stamp-count" id="stampCount">0</span>
+      </button>
+    </div>
+    <!-- 打卡小日历 -->
+    <div class="stamp-calendar" id="stampCalendar" style="display:none;">
+      <div class="stamp-header">
+        <button class="stamp-nav" id="stampPrev">&lt;</button>
+        <span class="stamp-month" id="stampMonth"></span>
+        <button class="stamp-nav" id="stampNext">&gt;</button>
+      </div>
+      <div class="stamp-weekdays">
+        <span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span>
+      </div>
+      <div class="stamp-days" id="stampDays"></div>
+    </div>
+    <!-- 搜索结果提示 -->
+    <div class="search-info" id="searchInfo" style="display:none;"></div>
+    <!-- 日记列表 -->
+    <div id="diaryList">
+      <div class="loading">正在翻开日记本</div>
+    </div>
   </section>
 
   <!-- 笔友通讯录 -->
@@ -421,6 +638,7 @@
 <script>
 (function() {
   const API_URL = 'https://love-nest-api.zeabur.app';
+  let allDiaryEntries = [];
 
   // ===== Tab switching =====
   document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -434,12 +652,12 @@
 
   // ===== Diary rendering =====
   async function loadDiary() {
-    const container = document.getElementById('tab-diary');
+    const container = document.getElementById('diaryList');
     try {
       const res = await fetch(`${API_URL}/rooms/mu/diary`);
       if (!res.ok) throw new Error('API not ready');
-      const entries = await res.json();
-      if (!entries || entries.length === 0) {
+      allDiaryEntries = await res.json();
+      if (!allDiaryEntries || allDiaryEntries.length === 0) {
         container.innerHTML = `
           <div class="empty-state">
             <div class="owl">🦉</div>
@@ -448,21 +666,9 @@
           </div>`;
         return;
       }
-      container.innerHTML = entries.map(e => `
-        <article class="diary-entry">
-          <div class="diary-date">
-            <span class="dot"></span>
-            ${e.date}
-            ${e.mood ? `<span class="diary-mood">${e.mood}</span>` : ''}
-          </div>
-          <div class="diary-content">${escapeHtml(e.content)}</div>
-          ${e.tags && e.tags.length ? `
-            <div class="diary-tags">
-              ${e.tags.map(t => `<span class="diary-tag">${escapeHtml(t)}</span>`).join('')}
-            </div>
-          ` : ''}
-        </article>
-      `).join('');
+      renderDiaryEntries(allDiaryEntries);
+      updateStampCount();
+      renderStampCalendar();
     } catch (e) {
       container.innerHTML = `
         <div class="empty-state">
@@ -470,6 +676,158 @@
           <p>日记本暂时打不开</p>
           <p style="margin-top:8px;font-size:12px;color:var(--text-muted)">后端可能还没有这个接口，需要更新 love-nest-api。</p>
         </div>`;
+    }
+  }
+
+  function renderDiaryEntries(entries, keyword) {
+    const container = document.getElementById('diaryList');
+    if (!entries || entries.length === 0) {
+      container.innerHTML = `
+        <div class="empty-state">
+          <div class="owl">🦉</div>
+          <p>没有找到相关日记。</p>
+        </div>`;
+      return;
+    }
+    container.innerHTML = entries.map(e => {
+      let content = escapeHtml(e.content);
+      if (keyword) {
+        const regex = new RegExp('(' + escapeRegex(escapeHtml(keyword)) + ')', 'gi');
+        content = content.replace(regex, '<mark>$1</mark>');
+      }
+      return `
+        <article class="diary-entry">
+          <div class="diary-date">
+            <span class="dot"></span>
+            ${e.date}
+            ${e.mood ? `<span class="diary-mood">${escapeHtml(e.mood)}</span>` : ''}
+          </div>
+          <div class="diary-content">${content}</div>
+          ${e.tags && e.tags.length ? `
+            <div class="diary-tags">
+              ${e.tags.map(t => `<span class="diary-tag">${escapeHtml(t)}</span>`).join('')}
+            </div>
+          ` : ''}
+        </article>`;
+    }).join('');
+  }
+
+  // ===== Search =====
+  const searchInput = document.getElementById('diarySearch');
+  const searchInfo = document.getElementById('searchInfo');
+  let searchTimer = null;
+
+  searchInput.addEventListener('input', () => {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => {
+      const keyword = searchInput.value.trim();
+      if (!keyword) {
+        searchInfo.style.display = 'none';
+        renderDiaryEntries(allDiaryEntries);
+        return;
+      }
+      const filtered = allDiaryEntries.filter(e =>
+        e.content.includes(keyword) ||
+        (e.mood && e.mood.includes(keyword)) ||
+        (e.tags && e.tags.some(t => t.includes(keyword)))
+      );
+      searchInfo.style.display = 'block';
+      searchInfo.innerHTML = `找到 <span class="highlight-count">${filtered.length}</span> 篇包含「${escapeHtml(keyword)}」的日记`;
+      renderDiaryEntries(filtered, keyword);
+    }, 300);
+  });
+
+  // ===== Stamp Calendar =====
+  const stampToggle = document.getElementById('stampToggle');
+  const stampCalendar = document.getElementById('stampCalendar');
+  let stampYear, stampMonth;
+
+  stampToggle.addEventListener('click', () => {
+    const showing = stampCalendar.style.display !== 'none';
+    stampCalendar.style.display = showing ? 'none' : 'block';
+    stampToggle.classList.toggle('active', !showing);
+  });
+
+  function initStampDate() {
+    const now = new Date();
+    stampYear = now.getFullYear();
+    stampMonth = now.getMonth();
+  }
+  initStampDate();
+
+  document.getElementById('stampPrev').addEventListener('click', () => {
+    stampMonth--;
+    if (stampMonth < 0) { stampMonth = 11; stampYear--; }
+    renderStampCalendar();
+  });
+
+  document.getElementById('stampNext').addEventListener('click', () => {
+    stampMonth++;
+    if (stampMonth > 11) { stampMonth = 0; stampYear++; }
+    renderStampCalendar();
+  });
+
+  function getDiaryDates() {
+    const dates = new Set();
+    allDiaryEntries.forEach(e => { if (e.date) dates.add(e.date); });
+    return dates;
+  }
+
+  function updateStampCount() {
+    document.getElementById('stampCount').textContent = allDiaryEntries.length;
+  }
+
+  function renderStampCalendar() {
+    const monthEl = document.getElementById('stampMonth');
+    const daysEl = document.getElementById('stampDays');
+    const diaryDates = getDiaryDates();
+
+    monthEl.textContent = `${stampYear}年${stampMonth + 1}月`;
+    daysEl.innerHTML = '';
+
+    const firstDay = new Date(stampYear, stampMonth, 1).getDay();
+    const daysInMonth = new Date(stampYear, stampMonth + 1, 0).getDate();
+    const daysInPrev = new Date(stampYear, stampMonth, 0).getDate();
+
+    const today = new Date();
+    const todayStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+
+    // Previous month
+    for (let i = firstDay - 1; i >= 0; i--) {
+      const d = document.createElement('div');
+      d.className = 'stamp-day other';
+      d.textContent = daysInPrev - i;
+      daysEl.appendChild(d);
+    }
+
+    // Current month
+    for (let i = 1; i <= daysInMonth; i++) {
+      const dateStr = `${stampYear}-${String(stampMonth+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
+      const d = document.createElement('div');
+      d.className = 'stamp-day';
+      d.textContent = i;
+
+      if (dateStr === todayStr) d.classList.add('today');
+      if (diaryDates.has(dateStr)) {
+        d.classList.add('has-diary');
+        d.addEventListener('click', () => {
+          searchInput.value = dateStr;
+          searchInput.dispatchEvent(new Event('input'));
+          stampCalendar.style.display = 'none';
+          stampToggle.classList.remove('active');
+        });
+      }
+      daysEl.appendChild(d);
+    }
+
+    // Next month fill
+    const totalCells = daysEl.children.length;
+    const remaining = (7 - totalCells % 7) % 7;
+    for (let i = 1; i <= remaining; i++) {
+      const d = document.createElement('div');
+      d.className = 'stamp-day other';
+      d.textContent = i;
+      daysEl.appendChild(d);
     }
   }
 
@@ -542,6 +900,10 @@
     const div = document.createElement('div');
     div.textContent = str;
     return div.innerHTML;
+  }
+
+  function escapeRegex(str) {
+    return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   }
 
   // ===== Init =====
