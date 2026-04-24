@@ -401,13 +401,13 @@ async function loadReader(){
       return`<div class="para-wrap${anns.length?' has-ann':''}" onclick="togAnn(${p.index})">
         <span class="para-idx">${p.index+1}</span>
         <div class="para-text">${esc(p.text)}</div>
-        ${anns.length?`<div class="ann-list">${anns.map(a=>`
+        ${anns.length?`<div class="ann-list" onclick="event.stopPropagation()">${anns.map(a=>`
           <div class="ann-bubble ${a.author==='小羊'?'yang':'mu'}">
             <div class="ann-author">${esc(a.author)} <span class="ann-type">${TE[a.type]||'💬'}${TL[a.type]||''}</span></div>
             <div class="ann-text">${esc(a.content)}</div>
             <button class="ann-del" onclick="event.stopPropagation();delAnn('${a.id}')">✕</button>
           </div>`).join('')}</div>`:''}
-        <div class="ann-input" id="ai-${p.index}">
+        <div class="ann-input" id="ai-${p.index}" onclick="event.stopPropagation()">
           <textarea id="at-${p.index}" placeholder="写点什么..."></textarea>
           <div class="ann-input-bar">
             <select id="aa-${p.index}"><option value="小羊">小羊</option><option value="暮">暮</option></select>
