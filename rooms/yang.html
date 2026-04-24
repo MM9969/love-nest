@@ -7,939 +7,518 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Noto+Serif+SC:wght@400;600&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #f5f0f5;
-    --bg-warm: #faf5fa;
-    --card: #fffcff;
-    --card-hover: #fff7ff;
-    --border: #e5d8e5;
-    --border-light: #f0e5f0;
-    --text: #3d2e3d;
-    --text-secondary: #8a7089;
-    --text-muted: #b5a0b4;
-    --accent: #c9a0c9;
-    --accent-light: #e8d0e8;
-    --accent-dark: #9e6e9e;
-    --shadow-sm: 0 1px 3px rgba(61,46,61,0.06);
-    --shadow-md: 0 4px 12px rgba(61,46,61,0.08);
-    --shadow-lg: 0 8px 24px rgba(61,46,61,0.1);
-    --radius: 12px;
-    --radius-lg: 18px;
-    --font-display: 'Cormorant Garamond', 'Noto Serif SC', serif;
-    --font-body: 'Noto Sans SC', -apple-system, sans-serif;
-  }
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body {
-    font-family: var(--font-body);
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    font-weight: 300;
-    line-height: 1.7;
-  }
+:root {
+  --bg:#f5f0f5;--card:#fffcff;--border:#e5d8e5;--border-light:#f0e5f0;
+  --text:#3d2e3d;--text-sec:#8a7089;--text-muted:#b5a0b4;
+  --accent:#c9a0c9;--accent-light:#e8d0e8;--accent-dark:#9e6e9e;
+  --quote-bg:#f8f0f8;--quote-border:#d8c0d8;
+  --action-bg:rgba(158,110,158,0.08);--dialogue-color:#8a5090;
+  --shadow-sm:0 1px 3px rgba(61,46,61,0.06);--shadow-md:0 4px 12px rgba(61,46,61,0.08);
+  --r:12px;--rl:18px;
+  --fd:'Cormorant Garamond','Noto Serif SC',serif;
+  --fb:'Noto Sans SC',-apple-system,sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--fb);background:var(--bg);color:var(--text);min-height:100vh;font-weight:300;line-height:1.7}
 
-  /* ===== Header ===== */
-  .room-header {
-    padding: 40px 32px 24px;
-    max-width: 960px;
-    margin: 0 auto;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-  }
-  .back-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    text-decoration: none;
-    color: var(--text-secondary);
-    font-size: 13px;
-    letter-spacing: 0.5px;
-    transition: color 0.3s;
-  }
-  .back-link:hover { color: var(--accent-dark); }
-  .back-link svg { width: 16px; height: 16px; }
-  .room-title-area { flex: 1; text-align: center; }
-  .room-title {
-    font-family: var(--font-display);
-    font-size: 28px;
-    font-weight: 400;
-    color: var(--text);
-    letter-spacing: 2px;
-  }
-  .room-title em { font-style: italic; color: var(--accent-dark); }
-  .room-subtitle {
-    font-size: 12px;
-    color: var(--text-muted);
-    letter-spacing: 3px;
-    margin-top: 4px;
-  }
+/* Header */
+.hdr{padding:40px 32px 24px;max-width:960px;margin:0 auto;display:flex;align-items:center;gap:16px}
+.back{display:inline-flex;align-items:center;gap:6px;text-decoration:none;color:var(--text-sec);font-size:13px;transition:color .3s}
+.back:hover{color:var(--accent-dark)}
+.back svg{width:16px;height:16px}
+.hdr-center{flex:1;text-align:center}
+.hdr h1{font-family:var(--fd);font-size:28px;font-weight:400;letter-spacing:2px}
+.hdr h1 em{font-style:italic;color:var(--accent-dark)}
+.hdr .sub{font-size:12px;color:var(--text-muted);letter-spacing:3px;margin-top:4px}
 
-  /* ===== Content ===== */
-  .content-area {
-    max-width: 960px;
-    margin: 0 auto;
-    padding: 0 32px 60px;
-  }
+.main{max-width:960px;margin:0 auto;padding:0 32px 60px}
 
-  /* ===== View transitions ===== */
-  .view { display: none; }
-  .view.active { display: block; animation: fadeIn 0.35s ease; }
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
+/* Views */
+.v{display:none}.v.on{display:block;animation:fi .3s ease}
+@keyframes fi{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 
-  /* ===== Gallery View ===== */
-  .gallery-toolbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-  }
-  .gallery-count {
-    font-size: 13px;
-    color: var(--text-muted);
-    letter-spacing: 0.5px;
-  }
-  .add-btn {
-    padding: 8px 16px;
-    border: 1px dashed var(--border);
-    border-radius: var(--radius);
-    background: none;
-    color: var(--text-secondary);
-    font-size: 12px;
-    cursor: pointer;
-    transition: all 0.2s;
-    font-family: var(--font-body);
-  }
-  .add-btn:hover { border-color: var(--accent); color: var(--accent-dark); }
+/* Breadcrumb */
+.crumb{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-muted);margin-bottom:16px;flex-wrap:wrap}
+.crumb span{cursor:pointer;transition:color .2s}.crumb span:hover{color:var(--accent-dark)}
+.crumb .sep{cursor:default;opacity:.5}
+.crumb .cur{color:var(--text);cursor:default;font-weight:500}
 
-  .char-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-    gap: 16px;
-  }
+/* Toolbar */
+.toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.toolbar .ct{font-size:13px;color:var(--text-muted)}
 
-  .char-card {
-    position: relative;
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-    background: var(--card);
-    border: 1px solid var(--border-light);
-    box-shadow: var(--shadow-sm);
-    cursor: pointer;
-    transition: all 0.3s;
-  }
-  .char-card:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-lg);
-  }
+/* Buttons */
+.btn-a{padding:7px 14px;border:1px dashed var(--border);border-radius:var(--r);background:none;color:var(--text-sec);font-size:12px;cursor:pointer;font-family:var(--fb);transition:all .2s}
+.btn-a:hover{border-color:var(--accent);color:var(--accent-dark)}
+.btn{padding:8px 16px;border-radius:var(--r);font-size:13px;font-family:var(--fb);cursor:pointer;border:none;transition:all .2s}
+.btn-p{background:var(--accent);color:#fff}.btn-p:hover{background:var(--accent-dark)}
+.btn-s{background:var(--bg);color:var(--text-sec);border:1px solid var(--border)}
+.btn-d{background:none;color:#c06060;border:1px solid #e0b0b0;font-size:11px;padding:5px 10px}
+.btn-d:hover{background:#fde8e8}
+.btn-e{background:none;color:var(--text-sec);border:1px solid var(--border);font-size:11px;padding:5px 10px}
+.btn-e:hover{background:var(--accent-light)}
+.act-btns{display:flex;gap:6px;margin-left:auto}
 
-  .char-card-img {
-    width: 100%;
-    aspect-ratio: 3/4;
-    object-fit: cover;
-    display: block;
-    background: var(--border-light);
-  }
-  .char-card-img.placeholder {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 48px;
-    color: var(--text-muted);
-  }
+/* Grid */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:16px}
 
-  .char-card-info {
-    padding: 12px 14px;
-  }
-  .char-card-name {
-    font-family: var(--font-display);
-    font-size: 16px;
-    font-weight: 600;
-    color: var(--text);
-    letter-spacing: 0.5px;
-  }
-  .char-card-tags {
-    margin-top: 4px;
-    display: flex;
-    gap: 4px;
-    flex-wrap: wrap;
-  }
-  .char-card-tag {
-    font-size: 10px;
-    padding: 1px 6px;
-    border-radius: 8px;
-    background: var(--accent-light);
-    color: var(--accent-dark);
-  }
+/* Card */
+.ccard{position:relative;border-radius:var(--rl);overflow:hidden;background:var(--card);border:1px solid var(--border-light);box-shadow:var(--shadow-sm);cursor:pointer;transition:all .3s}
+.ccard:hover{transform:translateY(-4px);box-shadow:var(--shadow-md)}
+.ccard-img{width:100%;aspect-ratio:3/4;object-fit:cover;display:block;background:var(--border-light)}
+.ccard-ph{width:100%;aspect-ratio:3/4;display:flex;align-items:center;justify-content:center;font-size:48px;background:var(--border-light);color:var(--text-muted)}
+.ccard-info{padding:12px 14px}
+.ccard-name{font-family:var(--fd);font-size:16px;font-weight:600;color:var(--text)}
+.ccard-tags{margin-top:4px;display:flex;gap:4px;flex-wrap:wrap}
+.ccard-tag{font-size:10px;padding:1px 6px;border-radius:8px;background:var(--accent-light);color:var(--accent-dark)}
+.ccard-ov{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(61,46,61,.85));padding:60px 14px 14px;opacity:0;transition:opacity .3s;pointer-events:none}
+.ccard:hover .ccard-ov{opacity:1}
+.ccard-desc{font-size:12px;color:rgba(255,255,255,.9);line-height:1.6;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
 
-  /* Hover overlay */
-  .char-card-overlay {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: linear-gradient(transparent, rgba(61,46,61,0.85));
-    padding: 60px 14px 14px;
-    opacity: 0;
-    transition: opacity 0.3s;
-    pointer-events: none;
-  }
-  .char-card:hover .char-card-overlay { opacity: 1; }
-  .char-card-desc {
-    font-size: 12px;
-    color: rgba(255,255,255,0.9);
-    line-height: 1.6;
-    display: -webkit-box;
-    -webkit-line-clamp: 4;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
+/* List items */
+.litem{background:var(--card);border:1px solid var(--border-light);border-radius:var(--r);padding:14px 18px;margin-bottom:10px;display:flex;align-items:center;gap:12px;transition:all .2s;cursor:pointer}
+.litem:hover{border-color:var(--accent-light);box-shadow:var(--shadow-sm);transform:translateX(3px)}
+.litem-main{flex:1;min-width:0}
+.litem-title{font-size:14px;font-weight:500;color:var(--text)}
+.litem-meta{font-size:11px;color:var(--text-muted);margin-top:2px}
+.litem .arrow{color:var(--text-muted);font-size:14px;flex-shrink:0}
 
-  /* ===== Detail View ===== */
-  .detail-back {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 13px;
-    color: var(--text-secondary);
-    cursor: pointer;
-    margin-bottom: 20px;
-    transition: color 0.2s;
-    background: none;
-    border: none;
-    font-family: var(--font-body);
-  }
-  .detail-back:hover { color: var(--accent-dark); }
+/* World book entry */
+.wb-entry{background:var(--card);border:1px solid var(--border-light);border-radius:var(--rl);margin-bottom:12px;overflow:hidden}
+.wb-header{padding:14px 18px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:background .2s}
+.wb-header:hover{background:var(--quote-bg)}
+.wb-keyword{font-weight:500;font-size:14px;color:var(--text);flex:1}
+.wb-toggle{color:var(--text-muted);font-size:12px;transition:transform .2s}
+.wb-entry.open .wb-toggle{transform:rotate(90deg)}
+.wb-body{display:none;padding:0 18px 16px;font-size:13px;line-height:1.9;color:var(--text-sec);white-space:pre-wrap;word-break:break-word}
+.wb-entry.open .wb-body{display:block}
 
-  .detail-header {
-    display: flex;
-    gap: 24px;
-    margin-bottom: 28px;
-  }
-  .detail-avatar {
-    width: 140px;
-    height: 186px;
-    border-radius: var(--radius-lg);
-    object-fit: cover;
-    flex-shrink: 0;
-    border: 1px solid var(--border-light);
-    box-shadow: var(--shadow-md);
-  }
-  .detail-avatar.placeholder {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 56px;
-    background: var(--card);
-  }
-  .detail-meta { flex: 1; }
-  .detail-name {
-    font-family: var(--font-display);
-    font-size: 26px;
-    font-weight: 600;
-    color: var(--text);
-    margin-bottom: 8px;
-  }
-  .detail-desc {
-    font-size: 13px;
-    color: var(--text-secondary);
-    line-height: 1.8;
-    margin-bottom: 16px;
-  }
+/* Info card (user persona / greeting) */
+.info-card{background:var(--card);border:1px solid var(--border-light);border-radius:var(--rl);padding:18px 22px;margin-bottom:14px}
+.info-card-label{font-size:11px;color:var(--text-muted);letter-spacing:1px;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.info-card-content{font-size:13px;line-height:1.9;color:var(--text);white-space:pre-wrap;word-break:break-word}
 
-  .detail-tabs {
-    display: flex;
-    gap: 0;
-    border-bottom: 1px solid var(--border-light);
-    margin-bottom: 20px;
-  }
-  .detail-tab {
-    padding: 10px 20px;
-    font-size: 13px;
-    color: var(--text-muted);
-    background: none;
-    border: none;
-    cursor: pointer;
-    position: relative;
-    font-family: var(--font-body);
-    letter-spacing: 0.5px;
-    transition: color 0.2s;
-  }
-  .detail-tab:hover { color: var(--text-secondary); }
-  .detail-tab.active { color: var(--text); font-weight: 500; }
-  .detail-tab.active::after {
-    content: '';
-    position: absolute;
-    bottom: -1px;
-    left: 20px;
-    right: 20px;
-    height: 2px;
-    background: var(--accent);
-    border-radius: 1px;
-  }
+/* Segment (forum post) */
+.seg{background:var(--card);border:1px solid var(--border-light);border-radius:var(--rl);margin-bottom:20px;overflow:hidden}
+.seg-header{padding:16px 20px 12px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border-light)}
+.seg-title{font-family:var(--fd);font-size:17px;font-weight:600;color:var(--text);flex:1}
+.seg-date{font-size:11px;color:var(--text-muted)}
 
-  .detail-panel { display: none; }
-  .detail-panel.active { display: block; }
+/* RP text formatting */
+.seg-text{padding:20px 24px;font-size:14px;line-height:2;color:var(--text);white-space:pre-wrap;word-break:break-word;border-bottom:1px solid var(--border-light);background:var(--quote-bg)}
+.seg-text .dialogue{color:var(--dialogue-color);font-weight:400}
+.seg-text .action{background:var(--action-bg);padding:1px 4px;border-radius:4px;font-style:italic;color:var(--text-sec)}
 
-  /* Saves list */
-  .save-item {
-    background: var(--card);
-    border: 1px solid var(--border-light);
-    border-radius: var(--radius);
-    padding: 16px 20px;
-    margin-bottom: 10px;
-    cursor: pointer;
-    transition: all 0.2s;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .save-item:hover {
-    border-color: var(--accent-light);
-    box-shadow: var(--shadow-sm);
-    transform: translateX(4px);
-  }
-  .save-title {
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--text);
-  }
-  .save-meta {
-    font-size: 11px;
-    color: var(--text-muted);
-    margin-top: 4px;
-  }
-  .save-arrow {
-    color: var(--text-muted);
-    font-size: 16px;
-  }
+/* Comments */
+.comments{padding:16px 20px}
+.comments-header{font-size:12px;color:var(--text-muted);letter-spacing:1px;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.comment{padding:12px 0;border-bottom:1px solid var(--border-light)}
+.comment:last-child{border-bottom:none}
+.comment-head{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.comment-floor{font-size:10px;color:var(--accent);font-weight:600;background:var(--accent-light);padding:1px 6px;border-radius:4px}
+.comment-author{font-size:12px;font-weight:500;color:var(--text)}
+.comment-date{font-size:10px;color:var(--text-muted);margin-left:auto}
+.comment-reply{font-size:11px;color:var(--accent-dark);margin-bottom:4px;font-style:italic}
+.comment-body{font-size:13px;line-height:1.8;color:var(--text);white-space:pre-wrap}
+.comment-actions{margin-top:6px;display:flex;gap:8px}
+.comment-actions button{background:none;border:none;font-size:11px;color:var(--text-muted);cursor:pointer;font-family:var(--fb)}
+.comment-actions button:hover{color:var(--accent-dark)}
 
-  /* Definition view */
-  .definition-box {
-    background: var(--card);
-    border: 1px solid var(--border-light);
-    border-radius: var(--radius-lg);
-    padding: 20px 24px;
-    font-size: 13px;
-    line-height: 1.9;
-    color: var(--text);
-    white-space: pre-wrap;
-    word-break: break-word;
-    max-height: 500px;
-    overflow-y: auto;
-  }
+/* Comment input */
+.cmt-input{margin-top:12px;display:flex;gap:8px;flex-direction:column}
+.cmt-input textarea{width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:var(--r);background:var(--card);font-size:13px;font-family:var(--fb);min-height:60px;resize:vertical;outline:none;line-height:1.7;color:var(--text)}
+.cmt-input textarea:focus{border-color:var(--accent)}
+.cmt-input-bar{display:flex;justify-content:space-between;align-items:center}
+.cmt-input-bar select{padding:5px 8px;border:1px solid var(--border);border-radius:8px;font-size:12px;background:var(--card);color:var(--text);font-family:var(--fb)}
+.reply-hint{font-size:11px;color:var(--accent-dark);font-style:italic;display:flex;align-items:center;gap:4px}
+.reply-hint button{background:none;border:none;color:var(--accent);cursor:pointer;font-size:11px}
 
-  /* ===== Reader View ===== */
-  .reader-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 24px;
-    padding-bottom: 16px;
-    border-bottom: 1px solid var(--border-light);
-  }
-  .reader-title {
-    font-family: var(--font-display);
-    font-size: 20px;
-    font-weight: 600;
-    color: var(--text);
-  }
-  .reader-info {
-    font-size: 12px;
-    color: var(--text-muted);
-  }
+/* Modal */
+.modal-bg{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(61,46,61,.4);z-index:100;align-items:center;justify-content:center;backdrop-filter:blur(3px)}
+.modal-bg.on{display:flex}
+.modal{background:var(--bg);border-radius:var(--rl);padding:28px;max-width:520px;width:90%;max-height:85vh;overflow-y:auto;box-shadow:0 8px 24px rgba(61,46,61,.12)}
+.modal h3{font-family:var(--fd);font-size:18px;font-weight:600;margin-bottom:18px}
+.modal label{display:block;font-size:11px;color:var(--text-sec);margin-bottom:4px;letter-spacing:.5px}
+.modal input,.modal textarea,.modal select{width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:var(--r);background:var(--card);color:var(--text);font-size:13px;font-family:var(--fb);margin-bottom:12px;outline:none}
+.modal input:focus,.modal textarea:focus{border-color:var(--accent)}
+.modal textarea{min-height:80px;resize:vertical;line-height:1.7}
+.modal-btns{display:flex;gap:10px;justify-content:flex-end;margin-top:6px}
 
-  .chat-log {
-    max-width: 700px;
-    margin: 0 auto;
-  }
+/* File drop */
+.fdrop{border:2px dashed var(--border);border-radius:var(--r);padding:20px;text-align:center;margin-bottom:14px;cursor:pointer;transition:all .2s;color:var(--text-muted);font-size:12px}
+.fdrop:hover,.fdrop.over{border-color:var(--accent);background:rgba(201,160,201,.05);color:var(--accent-dark)}
+.fdrop img{max-height:120px;border-radius:8px;margin-bottom:8px}
 
-  .chat-msg {
-    margin-bottom: 20px;
-    animation: fadeIn 0.3s ease both;
-  }
-  .chat-msg-header {
-    font-size: 12px;
-    font-weight: 500;
-    margin-bottom: 6px;
-    letter-spacing: 0.5px;
-  }
-  .chat-msg.user .chat-msg-header { color: var(--accent-dark); }
-  .chat-msg.char .chat-msg-header { color: var(--text-secondary); }
+/* Empty */
+.empty{text-align:center;padding:60px 20px;color:var(--text-muted)}
+.empty .ic{font-size:48px;margin-bottom:16px;opacity:.5}
+.empty p{font-size:14px}
 
-  .chat-msg-body {
-    font-size: 14px;
-    line-height: 2;
-    color: var(--text);
-    padding: 16px 20px;
-    border-radius: var(--radius-lg);
-    white-space: pre-wrap;
-    word-break: break-word;
-  }
-  .chat-msg.user .chat-msg-body {
-    background: var(--accent-light);
-    border: 1px solid var(--accent);
-    margin-left: 24px;
-  }
-  .chat-msg.char .chat-msg-body {
-    background: var(--card);
-    border: 1px solid var(--border-light);
-    margin-right: 24px;
-  }
-
-  /* Italic actions in RP */
-  .chat-msg-body em {
-    color: var(--text-secondary);
-    font-style: italic;
-  }
-
-  /* ===== Add Modal ===== */
-  .modal-overlay {
-    display: none;
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(61,46,61,0.4);
-    z-index: 100;
-    align-items: center;
-    justify-content: center;
-    backdrop-filter: blur(3px);
-  }
-  .modal-overlay.active { display: flex; }
-
-  .modal {
-    background: var(--bg-warm);
-    border-radius: var(--radius-lg);
-    padding: 32px;
-    max-width: 500px;
-    width: 90%;
-    max-height: 80vh;
-    overflow-y: auto;
-    box-shadow: var(--shadow-lg);
-  }
-  .modal h3 {
-    font-family: var(--font-display);
-    font-size: 20px;
-    font-weight: 600;
-    margin-bottom: 20px;
-    color: var(--text);
-  }
-  .modal label {
-    display: block;
-    font-size: 12px;
-    color: var(--text-secondary);
-    margin-bottom: 4px;
-    letter-spacing: 0.5px;
-  }
-  .modal input, .modal textarea {
-    width: 100%;
-    padding: 10px 14px;
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    background: var(--card);
-    color: var(--text);
-    font-size: 13px;
-    font-family: var(--font-body);
-    margin-bottom: 14px;
-    outline: none;
-    transition: border-color 0.2s;
-  }
-  .modal input:focus, .modal textarea:focus { border-color: var(--accent); }
-  .modal textarea { min-height: 100px; resize: vertical; line-height: 1.7; }
-
-  .modal-btns {
-    display: flex;
-    gap: 10px;
-    justify-content: flex-end;
-    margin-top: 8px;
-  }
-  .btn {
-    padding: 10px 20px;
-    border-radius: var(--radius);
-    font-size: 13px;
-    font-family: var(--font-body);
-    cursor: pointer;
-    transition: all 0.2s;
-    border: none;
-  }
-  .btn-primary {
-    background: var(--accent);
-    color: #fff;
-  }
-  .btn-primary:hover { background: var(--accent-dark); }
-  .btn-secondary {
-    background: var(--bg);
-    color: var(--text-secondary);
-    border: 1px solid var(--border);
-  }
-  .btn-secondary:hover { background: var(--border-light); }
-
-  /* File drop area */
-  .file-drop {
-    border: 2px dashed var(--border);
-    border-radius: var(--radius);
-    padding: 20px;
-    text-align: center;
-    margin-bottom: 14px;
-    cursor: pointer;
-    transition: all 0.2s;
-    color: var(--text-muted);
-    font-size: 12px;
-  }
-  .file-drop:hover, .file-drop.dragover {
-    border-color: var(--accent);
-    background: rgba(201,160,201,0.05);
-    color: var(--accent-dark);
-  }
-  .file-drop img {
-    max-height: 120px;
-    border-radius: 8px;
-    margin-bottom: 8px;
-  }
-
-  /* ===== Empty State ===== */
-  .empty-state {
-    text-align: center;
-    padding: 80px 20px;
-    color: var(--text-muted);
-  }
-  .empty-state .icon { font-size: 48px; margin-bottom: 16px; opacity: 0.5; }
-  .empty-state p { font-size: 14px; letter-spacing: 0.5px; }
-
-  /* ===== Responsive ===== */
-  @media (max-width: 640px) {
-    .room-header { padding: 28px 20px 16px; }
-    .room-title { font-size: 22px; }
-    .content-area { padding: 0 16px 40px; }
-    .char-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-    .detail-header { flex-direction: column; align-items: center; text-align: center; }
-    .detail-avatar { width: 120px; height: 160px; }
-    .chat-msg.user .chat-msg-body { margin-left: 8px; }
-    .chat-msg.char .chat-msg-body { margin-right: 8px; }
-    .modal { padding: 24px 20px; }
-  }
+@media(max-width:640px){
+  .hdr{padding:28px 16px 16px}.hdr h1{font-size:22px}
+  .main{padding:0 16px 40px}
+  .grid{grid-template-columns:repeat(2,1fr);gap:10px}
+  .seg-text{padding:16px}.comments{padding:12px 16px}
+  .modal{padding:20px 16px}
+}
 </style>
 </head>
 <body>
 
-<header class="room-header">
-  <a href="../index.html" class="back-link">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M15 19l-7-7 7-7"/></svg>
-    回到小窝
-  </a>
-  <div class="room-title-area">
-    <h1 class="room-title"><em>小羊</em>的房间</h1>
-    <div class="room-subtitle">YANG'S ROOM</div>
+<header class="hdr">
+  <a href="../index.html" class="back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M15 19l-7-7 7-7"/></svg>回到小窝</a>
+  <div class="hdr-center">
+    <h1><em>小羊</em>的房间</h1>
+    <div class="sub">YANG'S ROOM</div>
   </div>
-  <div style="width:60px;"></div>
+  <div style="width:60px"></div>
 </header>
 
-<main class="content-area">
-
-  <!-- VIEW 1: Gallery -->
-  <div id="view-gallery" class="view active">
-    <div class="gallery-toolbar">
-      <span class="gallery-count" id="charCount"></span>
-      <button class="add-btn" id="addCharBtn">+ 新角色卡</button>
-    </div>
-    <div class="char-grid" id="charGrid"></div>
+<main class="main">
+  <!-- V1: Gallery -->
+  <div id="v-gallery" class="v on">
+    <div class="toolbar"><span class="ct" id="charCt"></span><button class="btn-a" onclick="openModal('char')">+ 新角色卡</button></div>
+    <div class="grid" id="charGrid"></div>
   </div>
 
-  <!-- VIEW 2: Character Detail -->
-  <div id="view-detail" class="view">
-    <button class="detail-back" id="detailBack">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="16" height="16"><path d="M15 19l-7-7 7-7"/></svg>
-      返回画廊
-    </button>
-    <div class="detail-header" id="detailHeader"></div>
-    <div class="detail-tabs">
-      <button class="detail-tab active" data-panel="saves">存档</button>
-      <button class="detail-tab" data-panel="definition">角色设定</button>
+  <!-- V2: Character Detail -->
+  <div id="v-char" class="v">
+    <div class="crumb" id="charCrumb"></div>
+    <div id="charHeader"></div>
+    <div class="toolbar" style="margin-top:20px">
+      <div style="display:flex;gap:0;border-bottom:1px solid var(--border-light);flex:1" id="charTabs"></div>
     </div>
-    <div id="panel-saves" class="detail-panel active"></div>
-    <div id="panel-definition" class="detail-panel"></div>
-    <div style="margin-top:16px;">
-      <button class="add-btn" id="addSaveBtn">+ 导入存档</button>
-    </div>
+    <div id="charPanels"></div>
   </div>
 
-  <!-- VIEW 3: Reader -->
-  <div id="view-reader" class="view">
-    <button class="detail-back" id="readerBack">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="16" height="16"><path d="M15 19l-7-7 7-7"/></svg>
-      返回角色
-    </button>
-    <div class="reader-header" id="readerHeader"></div>
-    <div class="chat-log" id="chatLog"></div>
+  <!-- V3: Archive Detail -->
+  <div id="v-archive" class="v">
+    <div class="crumb" id="archCrumb"></div>
+    <div id="archInfo"></div>
+    <div class="toolbar" style="margin-top:20px"><span class="ct" id="segCt"></span><button class="btn-a" onclick="openModal('seg')">+ 精选段落</button></div>
+    <div id="segList"></div>
   </div>
-
 </main>
 
-<!-- Add Character Modal -->
-<div class="modal-overlay" id="charModal">
-  <div class="modal">
-    <h3>新角色卡</h3>
-    <div class="file-drop" id="imgDrop">
-      点击或拖拽角色卡图片到这里
-      <input type="file" accept="image/*" id="imgInput" style="display:none">
-    </div>
-    <label>角色名</label>
-    <input type="text" id="charName" placeholder="角色名称">
-    <label>简介</label>
-    <textarea id="charDesc" placeholder="角色简介，hover时显示"></textarea>
-    <label>设定 (JSON / 文本)</label>
-    <textarea id="charDef" placeholder="粘贴SillyTavern角色卡的JSON或设定文本" style="min-height:120px;font-size:12px;"></textarea>
-    <label>标签（逗号分隔）</label>
-    <input type="text" id="charTags" placeholder="原创, 奇幻, 恋爱...">
-    <div class="modal-btns">
-      <button class="btn btn-secondary" id="charModalClose">取消</button>
-      <button class="btn btn-primary" id="charModalSave">保存</button>
-    </div>
-  </div>
-</div>
-
-<!-- Import Save Modal -->
-<div class="modal-overlay" id="saveModal">
-  <div class="modal">
-    <h3>导入存档</h3>
-    <label>存档标题</label>
-    <input type="text" id="saveTitle" placeholder="给这段剧情起个名字">
-    <label>剧情简介（可选）</label>
-    <textarea id="saveSummary" placeholder="大概讲了什么" style="min-height:60px;"></textarea>
-    <label>聊天记录</label>
-    <div class="file-drop" id="jsonlDrop">
-      拖拽 .jsonl 聊天记录到这里，或点击选择文件
-      <input type="file" accept=".jsonl,.json,.txt" id="jsonlInput" style="display:none">
-    </div>
-    <textarea id="saveJsonl" placeholder="或直接粘贴JSONL内容..." style="min-height:120px;font-size:11px;"></textarea>
-    <div class="modal-btns">
-      <button class="btn btn-secondary" id="saveModalClose">取消</button>
-      <button class="btn btn-primary" id="saveModalSave">导入</button>
-    </div>
-  </div>
-</div>
+<!-- Universal Modal -->
+<div class="modal-bg" id="modalBg"><div class="modal" id="modalContent"></div></div>
 
 <script>
-(function() {
-  const API = 'https://love-nest-api.zeabur.app';
-  let currentCharId = null;
+const A='https://love-nest-api.zeabur.app';
+let chars=[],curChar=null,curArch=null,replyTo=null;
 
-  // ===== View switching =====
-  function showView(id) {
-    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-    document.getElementById('view-' + id).classList.add('active');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+// ===== Navigation =====
+function go(v){document.querySelectorAll('.v').forEach(e=>e.classList.remove('on'));document.getElementById('v-'+v).classList.add('on');window.scrollTo({top:0,behavior:'smooth'})}
+
+// ===== Utils =====
+function esc(s){if(!s)return'';const d=document.createElement('div');d.textContent=s;return d.innerHTML}
+
+function fmtRP(text){
+  let s=esc(text);
+  // **action** → styled span
+  s=s.replace(/\*\*([^*]+)\*\*/g,'<span class="action">$1</span>');
+  s=s.replace(/\*([^*]+)\*/g,'<span class="action">$1</span>');
+  // "dialogue" → colored
+  s=s.replace(/「([^」]+)」/g,'<span class="dialogue">「$1」</span>');
+  s=s.replace(/&quot;([^&]+)&quot;/g,'<span class="dialogue">"$1"</span>');
+  s=s.replace(/"([^"]+)"/g,'<span class="dialogue">"$1"</span>');
+  return s;
+}
+
+async function api(path,method='GET',body=null){
+  const opts={method,headers:{'Content-Type':'application/json'}};
+  if(body)opts.body=JSON.stringify(body);
+  const r=await fetch(A+path,opts);
+  return r.json();
+}
+
+// ===== Modal =====
+function openModal(type,data){
+  const m=document.getElementById('modalContent');
+  const bg=document.getElementById('modalBg');
+  let html='';
+  switch(type){
+    case 'char':
+      html=`<h3>${data?'编辑':'新建'}角色卡</h3>
+        <div class="fdrop" id="imgDrop">${data&&data.image?`<img src="${data.image.startsWith('/')?A:''}${data.image}"><br>点击更换`:'点击或拖拽角色卡图片'}<input type="file" accept="image/*" id="imgIn" style="display:none"></div>
+        <label>角色名</label><input id="f-name" value="${esc(data?.name||'')}">
+        <label>简介</label><textarea id="f-desc">${esc(data?.description||'')}</textarea>
+        <label>标签（逗号分隔）</label><input id="f-tags" value="${(data?.tags||[]).join(', ')}">
+        <div class="modal-btns">${data?'<button class="btn btn-d" onclick="delChar(\''+data.id+'\')">删除</button>':''}<button class="btn btn-s" onclick="closeModal()">取消</button><button class="btn btn-p" onclick="saveChar('${data?.id||''}')">保存</button></div>`;
+      break;
+    case 'wb':
+      html=`<h3>${data?'编辑':'新建'}世界书条目</h3>
+        <label>关键词</label><input id="f-kw" value="${esc(data?.keyword||'')}">
+        <label>内容</label><textarea id="f-wbc" style="min-height:150px">${esc(data?.content||'')}</textarea>
+        <div class="modal-btns">${data?'<button class="btn btn-d" onclick="delWb(\''+data.id+'\')">删除</button>':''}<button class="btn btn-s" onclick="closeModal()">取消</button><button class="btn btn-p" onclick="saveWb('${data?.id||''}')">保存</button></div>`;
+      break;
+    case 'arch':
+      html=`<h3>${data?'编辑':'新建'}存档</h3>
+        <label>标题</label><input id="f-atitle" value="${esc(data?.title||'')}">
+        <label>User 设定</label><textarea id="f-up" style="min-height:100px">${esc(data?.userPersona||'')}</textarea>
+        <label>开场白</label><textarea id="f-greet" style="min-height:100px">${esc(data?.greeting||'')}</textarea>
+        <div class="modal-btns">${data?'<button class="btn btn-d" onclick="delArch(\''+data.id+'\')">删除</button>':''}<button class="btn btn-s" onclick="closeModal()">取消</button><button class="btn btn-p" onclick="saveArch('${data?.id||''}')">保存</button></div>`;
+      break;
+    case 'seg':
+      html=`<h3>${data?'编辑':'新建'}精选段落</h3>
+        <label>标题</label><input id="f-stitle" value="${esc(data?.title||'')}">
+        <label>RP文本</label><textarea id="f-scontent" style="min-height:200px" placeholder="粘贴RP段落。\n&quot;对话&quot; 会变色，**动作** 会加底纹">${esc(data?.content||'')}</textarea>
+        <div class="modal-btns">${data?'<button class="btn btn-d" onclick="delSeg(\''+data.id+'\')">删除</button>':''}<button class="btn btn-s" onclick="closeModal()">取消</button><button class="btn btn-p" onclick="saveSeg('${data?.id||''}')">保存</button></div>`;
+      break;
   }
+  m.innerHTML=html;
+  bg.classList.add('on');
+  // Image drop setup
+  if(type==='char')setupImg(data);
+}
+function closeModal(){document.getElementById('modalBg').classList.remove('on')}
 
-  document.getElementById('detailBack').onclick = () => showView('gallery');
-  document.getElementById('readerBack').onclick = () => {
-    showView('detail');
-    loadSaves(currentCharId);
-  };
+let imgB64='';
+function setupImg(data){
+  imgB64=data?.image||'';
+  const drop=document.getElementById('imgDrop'),inp=document.getElementById('imgIn');
+  if(!drop||!inp)return;
+  drop.onclick=()=>inp.click();
+  drop.ondragover=e=>{e.preventDefault();drop.classList.add('over')};
+  drop.ondragleave=()=>drop.classList.remove('over');
+  drop.ondrop=e=>{e.preventDefault();drop.classList.remove('over');readImg(e.dataTransfer.files[0])};
+  inp.onchange=()=>{if(inp.files[0])readImg(inp.files[0])};
+}
+function readImg(f){
+  if(!f||!f.type.startsWith('image/'))return;
+  const r=new FileReader();
+  r.onload=e=>{imgB64=e.target.result;const d=document.getElementById('imgDrop');d.innerHTML=`<img src="${imgB64}"><br>点击更换<input type="file" accept="image/*" id="imgIn" style="display:none">`;setupImg({image:imgB64})};
+  r.readAsDataURL(f);
+}
 
-  // Detail sub-tabs
-  document.querySelectorAll('.detail-tab').forEach(tab => {
-    tab.addEventListener('click', () => {
-      document.querySelectorAll('.detail-tab').forEach(t => t.classList.remove('active'));
-      document.querySelectorAll('.detail-panel').forEach(p => p.classList.remove('active'));
-      tab.classList.add('active');
-      document.getElementById('panel-' + tab.dataset.panel).classList.add('active');
-    });
-  });
+// ===== Characters =====
+async function loadGallery(){
+  const g=document.getElementById('charGrid'),ct=document.getElementById('charCt');
+  try{
+    chars=await api('/rooms/yang/characters');
+    ct.textContent=chars.length?chars.length+' 张角色卡':'';
+    if(!chars.length){g.innerHTML='<div class="empty" style="grid-column:1/-1"><div class="ic">🐑</div><p>还没有角色卡</p></div>';return}
+    g.innerHTML=chars.map(c=>`
+      <div class="ccard" onclick="openChar('${c.id}')">
+        ${c.image?`<img class="ccard-img" src="${c.image.startsWith('data:')||c.image.startsWith('http')?'':A}${c.image}" onerror="this.outerHTML='<div class=ccard-ph>🎭</div>'">`:'<div class="ccard-ph">🎭</div>'}
+        <div class="ccard-info"><div class="ccard-name">${esc(c.name)}</div>
+        ${c.tags?.length?'<div class="ccard-tags">'+c.tags.slice(0,3).map(t=>'<span class="ccard-tag">'+esc(t)+'</span>').join('')+'</div>':''}</div>
+        ${c.description?'<div class="ccard-ov"><div class="ccard-desc">'+esc(c.description)+'</div></div>':''}
+      </div>`).join('');
+  }catch(e){g.innerHTML='<div class="empty" style="grid-column:1/-1"><div class="ic">🐑</div><p>后端暂未就绪</p></div>'}
+}
 
-  // ===== Gallery =====
-  async function loadGallery() {
-    const grid = document.getElementById('charGrid');
-    const count = document.getElementById('charCount');
-    try {
-      const res = await fetch(`${API}/rooms/yang/characters`);
-      if (!res.ok) throw new Error();
-      const chars = await res.json();
-      count.textContent = chars.length ? `${chars.length} 张角色卡` : '';
-      if (!chars.length) {
-        grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;">
-          <div class="icon">🐑</div>
-          <p>还没有角色卡</p>
-          <p style="margin-top:8px;font-size:12px;">点击上方「+ 新角色卡」添加你的第一张卡</p>
-        </div>`;
-        return;
-      }
-      grid.innerHTML = chars.map(c => `
-        <div class="char-card" data-id="${c.id}">
-          ${c.image
-            ? `<img class="char-card-img" src="${c.image.startsWith('data:') || c.image.startsWith('http') ? '' : API}${c.image}" alt="${esc(c.name)}" onerror="this.outerHTML='<div class=\\'char-card-img placeholder\\'>🎭</div>'">`
-            : '<div class="char-card-img placeholder">🎭</div>'
-          }
-          <div class="char-card-info">
-            <div class="char-card-name">${esc(c.name)}</div>
-            ${c.tags && c.tags.length ? `<div class="char-card-tags">${c.tags.slice(0,3).map(t => `<span class="char-card-tag">${esc(t)}</span>`).join('')}</div>` : ''}
+async function saveChar(id){
+  const name=document.getElementById('f-name').value.trim();
+  if(!name)return alert('请输入角色名');
+  const body={name,description:document.getElementById('f-desc').value.trim(),tags:document.getElementById('f-tags').value.split(',').map(s=>s.trim()).filter(Boolean)};
+  if(imgB64&&imgB64.startsWith('data:'))body.image=imgB64;
+  if(id){await api('/rooms/yang/characters/'+id,'PUT',body)}
+  else{const r=await api('/rooms/yang/characters','POST',body);if(r.char&&imgB64&&imgB64.startsWith('data:'))body.image=imgB64}
+  closeModal();loadGallery();
+}
+
+async function delChar(id){
+  if(!confirm('确定删除这个角色卡？相关世界书和存档都会删除。'))return;
+  await api('/rooms/yang/characters/'+id,'DELETE');
+  closeModal();go('gallery');loadGallery();
+}
+
+// ===== Character Detail =====
+async function openChar(id){
+  curChar=chars.find(c=>c.id===id);if(!curChar)return;
+  // Crumb
+  document.getElementById('charCrumb').innerHTML=`<span onclick="go('gallery')">画廊</span><span class="sep">›</span><span class="cur">${esc(curChar.name)}</span><div class="act-btns"><button class="btn-e" onclick="openModal('char',curChar)">编辑</button></div>`;
+  // Header
+  document.getElementById('charHeader').innerHTML=`
+    <div style="display:flex;gap:20px;align-items:flex-start">
+      ${curChar.image?`<img style="width:120px;height:160px;border-radius:var(--rl);object-fit:cover;border:1px solid var(--border-light);box-shadow:var(--shadow-md)" src="${curChar.image.startsWith('data:')||curChar.image.startsWith('http')?'':A}${curChar.image}" onerror="this.style.display='none'">`:''}
+      <div style="flex:1"><div style="font-family:var(--fd);font-size:22px;font-weight:600">${esc(curChar.name)}</div>
+      ${curChar.description?'<div style="font-size:13px;color:var(--text-sec);margin-top:6px;line-height:1.8">'+esc(curChar.description)+'</div>':''}
+      ${curChar.tags?.length?'<div class="ccard-tags" style="margin-top:8px">'+curChar.tags.map(t=>'<span class="ccard-tag">'+esc(t)+'</span>').join('')+'</div>':''}</div>
+    </div>`;
+  // Tabs
+  const tabs=document.getElementById('charTabs');
+  tabs.innerHTML=['世界书','存档'].map((t,i)=>`<button class="tab-btn${i===0?' active':''}" onclick="switchCharTab(${i},this)" style="padding:10px 20px;font-size:13px;color:${i===0?'var(--text)':'var(--text-muted)'};background:none;border:none;cursor:pointer;position:relative;font-family:var(--fb);letter-spacing:.5px;font-weight:${i===0?'500':'400'}">${t}</button>`).join('');
+  const panels=document.getElementById('charPanels');
+  panels.innerHTML='<div id="p-wb"></div><div id="p-arch" style="display:none"></div>';
+  await loadWb();await loadArchives();
+  go('char');
+}
+
+function switchCharTab(i,btn){
+  document.querySelectorAll('#charTabs button').forEach((b,j)=>{b.style.color=j===i?'var(--text)':'var(--text-muted)';b.style.fontWeight=j===i?'500':'400'});
+  document.getElementById('p-wb').style.display=i===0?'block':'none';
+  document.getElementById('p-arch').style.display=i===1?'block':'none';
+}
+
+// ===== World Book =====
+async function loadWb(){
+  const p=document.getElementById('p-wb');
+  try{
+    const entries=await api(`/rooms/yang/characters/${curChar.id}/worldbook`);
+    p.innerHTML=`<div class="toolbar"><span class="ct">${entries.length} 条目</span><button class="btn-a" onclick="openModal('wb')">+ 条目</button></div>`+
+      (entries.length?entries.map(e=>`
+        <div class="wb-entry" id="wb-${e.id}">
+          <div class="wb-header" onclick="document.getElementById('wb-${e.id}').classList.toggle('open')">
+            <span class="wb-keyword">${esc(e.keyword)}</span>
+            <div class="act-btns"><button class="btn-e" onclick="event.stopPropagation();openModal('wb',${JSON.stringify(e).replace(/"/g,'&quot;')})">编辑</button></div>
+            <span class="wb-toggle">›</span>
           </div>
-          ${c.description ? `<div class="char-card-overlay"><div class="char-card-desc">${esc(c.description)}</div></div>` : ''}
+          <div class="wb-body">${esc(e.content)}</div>
+        </div>`).join(''):'<div class="empty"><p>还没有世界书条目</p></div>');
+  }catch(e){p.innerHTML='<div class="empty"><p>加载失败</p></div>'}
+}
+
+async function saveWb(id){
+  const kw=document.getElementById('f-kw').value.trim();
+  if(!kw)return alert('请输入关键词');
+  const body={keyword:kw,content:document.getElementById('f-wbc').value};
+  if(id)await api(`/rooms/yang/characters/${curChar.id}/worldbook/${id}`,'PUT',body);
+  else await api(`/rooms/yang/characters/${curChar.id}/worldbook`,'POST',body);
+  closeModal();loadWb();
+}
+
+async function delWb(id){
+  if(!confirm('删除这个条目？'))return;
+  await api(`/rooms/yang/characters/${curChar.id}/worldbook/${id}`,'DELETE');
+  closeModal();loadWb();
+}
+
+// ===== Archives =====
+async function loadArchives(){
+  const p=document.getElementById('p-arch');
+  try{
+    const archs=await api(`/rooms/yang/characters/${curChar.id}/archives`);
+    p.innerHTML=`<div class="toolbar"><span class="ct">${archs.length} 个存档</span><button class="btn-a" onclick="openModal('arch')">+ 存档</button></div>`+
+      (archs.length?archs.map(a=>`
+        <div class="litem" onclick="openArchive('${a.id}')">
+          <div class="litem-main"><div class="litem-title">${esc(a.title)}</div><div class="litem-meta">${a.segmentCount||0} 个段落</div></div>
+          <div class="act-btns"><button class="btn-e" onclick="event.stopPropagation();editArch('${a.id}')">编辑</button></div>
+          <span class="arrow">→</span>
+        </div>`).join(''):'<div class="empty"><p>还没有存档</p></div>');
+  }catch(e){p.innerHTML='<div class="empty"><p>加载失败</p></div>'}
+}
+
+async function saveArch(id){
+  const title=document.getElementById('f-atitle').value.trim();
+  if(!title)return alert('请输入标题');
+  const body={title,userPersona:document.getElementById('f-up').value,greeting:document.getElementById('f-greet').value};
+  if(id)await api(`/rooms/yang/characters/${curChar.id}/archives/${id}`,'PUT',body);
+  else await api(`/rooms/yang/characters/${curChar.id}/archives`,'POST',body);
+  closeModal();loadArchives();
+}
+
+async function editArch(id){
+  const arch=await api(`/rooms/yang/characters/${curChar.id}/archives/${id}`);
+  openModal('arch',arch);
+}
+
+async function delArch(id){
+  if(!confirm('删除这个存档？'))return;
+  await api(`/rooms/yang/characters/${curChar.id}/archives/${id}`,'DELETE');
+  closeModal();loadArchives();
+}
+
+// ===== Archive Detail =====
+async function openArchive(id){
+  try{
+    curArch=await api(`/rooms/yang/characters/${curChar.id}/archives/${id}`);
+    document.getElementById('archCrumb').innerHTML=`<span onclick="go('gallery')">画廊</span><span class="sep">›</span><span onclick="openChar('${curChar.id}')">${esc(curChar.name)}</span><span class="sep">›</span><span class="cur">${esc(curArch.title)}</span><div class="act-btns"><button class="btn-e" onclick="editArch('${curArch.id}')">编辑</button></div>`;
+    // Info cards
+    let info='';
+    if(curArch.userPersona){info+=`<div class="info-card"><div class="info-card-label">👤 User 设定</div><div class="info-card-content">${esc(curArch.userPersona)}</div></div>`}
+    if(curArch.greeting){info+=`<div class="info-card"><div class="info-card-label">💬 开场白</div><div class="info-card-content">${fmtRP(curArch.greeting)}</div></div>`}
+    document.getElementById('archInfo').innerHTML=info;
+    // Segments
+    const segs=curArch.segments||[];
+    document.getElementById('segCt').textContent=segs.length?segs.length+' 个段落':'';
+    if(!segs.length){document.getElementById('segList').innerHTML='<div class="empty"><p>还没有精选段落</p></div>';go('archive');return}
+    document.getElementById('segList').innerHTML=segs.map(s=>{
+      const cmts=s.comments||[];
+      return`<div class="seg" id="seg-${s.id}">
+        <div class="seg-header">
+          <div class="seg-title">${esc(s.title)}</div>
+          <div class="act-btns"><button class="btn-e" onclick="openModal('seg',${JSON.stringify({id:s.id,title:s.title,content:s.content}).replace(/"/g,'&quot;')})">编辑</button><button class="btn-d" onclick="delSeg('${s.id}')">删除</button></div>
         </div>
-      `).join('');
-
-      grid.querySelectorAll('.char-card').forEach(card => {
-        card.addEventListener('click', () => openDetail(card.dataset.id, chars));
-      });
-    } catch (e) {
-      grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;"><div class="icon">🐑</div><p>后端接口暂未就绪</p></div>`;
-    }
-  }
-
-  // ===== Detail =====
-  async function openDetail(charId, chars) {
-    currentCharId = charId;
-    const char = chars ? chars.find(c => c.id === charId) : null;
-    if (!char) return;
-
-    const header = document.getElementById('detailHeader');
-    header.innerHTML = `
-      ${char.image
-        ? `<img class="detail-avatar" src="${char.image.startsWith('data:') || char.image.startsWith('http') ? '' : API}${char.image}" alt="${esc(char.name)}" onerror="this.outerHTML='<div class=\\'detail-avatar placeholder\\'>🎭</div>'">`
-        : '<div class="detail-avatar placeholder">🎭</div>'
-      }
-      <div class="detail-meta">
-        <div class="detail-name">${esc(char.name)}</div>
-        <div class="detail-desc">${esc(char.description || '暂无简介')}</div>
-        ${char.tags && char.tags.length ? `<div class="char-card-tags">${char.tags.map(t => `<span class="char-card-tag">${esc(t)}</span>`).join('')}</div>` : ''}
-      </div>`;
-
-    // Definition
-    const defPanel = document.getElementById('panel-definition');
-    defPanel.innerHTML = char.definition
-      ? `<div class="definition-box">${esc(char.definition)}</div>`
-      : `<div class="empty-state"><p>暂无设定数据</p></div>`;
-
-    // Reset to saves tab
-    document.querySelectorAll('.detail-tab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.detail-panel').forEach(p => p.classList.remove('active'));
-    document.querySelector('.detail-tab[data-panel="saves"]').classList.add('active');
-    document.getElementById('panel-saves').classList.add('active');
-
-    await loadSaves(charId);
-    showView('detail');
-  }
-
-  async function loadSaves(charId) {
-    const panel = document.getElementById('panel-saves');
-    try {
-      const res = await fetch(`${API}/rooms/yang/characters/${charId}/saves`);
-      if (!res.ok) throw new Error();
-      const saves = await res.json();
-      if (!saves.length) {
-        panel.innerHTML = `<div class="empty-state"><div class="icon">📄</div><p>还没有存档</p></div>`;
-        return;
-      }
-      panel.innerHTML = saves.map(s => `
-        <div class="save-item" data-id="${s.id}">
-          <div>
-            <div class="save-title">${esc(s.title)}</div>
-            <div class="save-meta">${s.messageCount} 条对话${s.summary ? ' · ' + esc(s.summary).slice(0, 40) : ''}</div>
+        <div class="seg-text">${fmtRP(s.content)}</div>
+        <div class="comments">
+          <div class="comments-header">💬 评论 (${cmts.length})</div>
+          ${cmts.map(c=>`<div class="comment" id="cmt-${c.id}">
+            <div class="comment-head">
+              <span class="comment-floor">#${c.floor}</span>
+              <span class="comment-author">${esc(c.author)}</span>
+              <span class="comment-date">${(c.created||'').slice(0,10)}</span>
+            </div>
+            ${c.replyTo?'<div class="comment-reply">回复 #'+c.replyTo+'</div>':''}
+            <div class="comment-body">${esc(c.content)}</div>
+            <div class="comment-actions">
+              <button onclick="setReply('${s.id}',${c.floor})">回复</button>
+              <button onclick="delComment('${s.id}','${c.id}')">删除</button>
+            </div>
+          </div>`).join('')}
+          <div class="cmt-input" id="cmtin-${s.id}">
+            <div class="reply-hint" id="rh-${s.id}" style="display:none">回复 <span id="rt-${s.id}"></span> <button onclick="clearReply('${s.id}')">✕</button></div>
+            <textarea id="cmttext-${s.id}" placeholder="写评论..."></textarea>
+            <div class="cmt-input-bar">
+              <select id="cmtauthor-${s.id}"><option value="小羊">小羊</option><option value="暮">暮</option></select>
+              <button class="btn btn-p" onclick="postComment('${s.id}')" style="padding:6px 14px;font-size:12px">发布</button>
+            </div>
           </div>
-          <span class="save-arrow">→</span>
         </div>
-      `).join('');
+      </div>`}).join('');
+    go('archive');
+  }catch(e){console.error(e)}
+}
 
-      panel.querySelectorAll('.save-item').forEach(item => {
-        item.addEventListener('click', () => openReader(charId, item.dataset.id));
-      });
-    } catch (e) {
-      panel.innerHTML = `<div class="empty-state"><p>存档暂时打不开</p></div>`;
-    }
-  }
+// ===== Segments CRUD =====
+async function saveSeg(id){
+  const title=document.getElementById('f-stitle').value.trim();
+  const content=document.getElementById('f-scontent').value;
+  if(!content)return alert('请粘贴RP文本');
+  const body={title:title||undefined,content};
+  if(id)await api(`/rooms/yang/characters/${curChar.id}/archives/${curArch.id}/segments/${id}`,'PUT',body);
+  else await api(`/rooms/yang/characters/${curChar.id}/archives/${curArch.id}/segments`,'POST',body);
+  closeModal();openArchive(curArch.id);
+}
 
-  // ===== Reader =====
-  async function openReader(charId, saveId) {
-    const header = document.getElementById('readerHeader');
-    const log = document.getElementById('chatLog');
-    header.innerHTML = '<div class="reader-title">加载中...</div>';
-    log.innerHTML = '';
-    showView('reader');
+async function delSeg(id){
+  if(!confirm('删除这个段落？'))return;
+  await api(`/rooms/yang/characters/${curChar.id}/archives/${curArch.id}/segments/${id}`,'DELETE');
+  openArchive(curArch.id);
+}
 
-    try {
-      const res = await fetch(`${API}/rooms/yang/characters/${charId}/saves/${saveId}`);
-      if (!res.ok) throw new Error();
-      const save = await res.json();
+// ===== Comments =====
+function setReply(sid,floor){
+  replyTo=floor;
+  document.getElementById('rh-'+sid).style.display='flex';
+  document.getElementById('rt-'+sid).textContent='#'+floor;
+  document.getElementById('cmttext-'+sid).focus();
+}
+function clearReply(sid){
+  replyTo=null;
+  document.getElementById('rh-'+sid).style.display='none';
+}
 
-      header.innerHTML = `
-        <div>
-          <div class="reader-title">${esc(save.title)}</div>
-          ${save.summary ? `<div class="reader-info">${esc(save.summary)}</div>` : ''}
-        </div>
-        <div class="reader-info">${save.messages ? save.messages.length : 0} 条对话</div>`;
+async function postComment(sid){
+  const text=document.getElementById('cmttext-'+sid).value.trim();
+  const author=document.getElementById('cmtauthor-'+sid).value;
+  if(!text)return;
+  const body={author,content:text};
+  if(replyTo)body.replyTo=replyTo;
+  await api(`/rooms/yang/characters/${curChar.id}/archives/${curArch.id}/segments/${sid}/comments`,'POST',body);
+  replyTo=null;
+  openArchive(curArch.id);
+}
 
-      if (!save.messages || !save.messages.length) {
-        log.innerHTML = `<div class="empty-state"><p>这个存档是空的</p></div>`;
-        return;
-      }
+async function delComment(sid,cid){
+  if(!confirm('删除这条评论？'))return;
+  await api(`/rooms/yang/characters/${curChar.id}/archives/${curArch.id}/segments/${sid}/comments/${cid}`,'DELETE');
+  openArchive(curArch.id);
+}
 
-      log.innerHTML = save.messages.map((m, i) => {
-        let content = esc(m.content);
-        // Render *italics* for RP actions
-        content = content.replace(/\*([^*]+)\*/g, '<em>$1</em>');
-        return `
-          <div class="chat-msg ${m.isUser ? 'user' : 'char'}" style="animation-delay:${Math.min(i * 0.03, 1)}s">
-            <div class="chat-msg-header">${esc(m.name)}</div>
-            <div class="chat-msg-body">${content}</div>
-          </div>`;
-      }).join('');
-    } catch (e) {
-      log.innerHTML = `<div class="empty-state"><p>存档加载失败</p></div>`;
-    }
-  }
-
-  // ===== Add Character Modal =====
-  const charModal = document.getElementById('charModal');
-  let imgBase64 = '';
-
-  document.getElementById('addCharBtn').onclick = () => {
-    charModal.classList.add('active');
-    imgBase64 = '';
-    document.getElementById('imgDrop').innerHTML = '点击或拖拽角色卡图片到这里<input type="file" accept="image/*" id="imgInput" style="display:none">';
-    ['charName','charDesc','charDef','charTags'].forEach(id => document.getElementById(id).value = '');
-    setupImgDrop();
-  };
-  document.getElementById('charModalClose').onclick = () => charModal.classList.remove('active');
-
-  function setupImgDrop() {
-    const drop = document.getElementById('imgDrop');
-    const input = document.getElementById('imgInput');
-    drop.onclick = () => input.click();
-    drop.ondragover = e => { e.preventDefault(); drop.classList.add('dragover'); };
-    drop.ondragleave = () => drop.classList.remove('dragover');
-    drop.ondrop = e => {
-      e.preventDefault();
-      drop.classList.remove('dragover');
-      handleImgFile(e.dataTransfer.files[0]);
-    };
-    input.onchange = () => { if (input.files[0]) handleImgFile(input.files[0]); };
-  }
-
-  function handleImgFile(file) {
-    if (!file || !file.type.startsWith('image/')) return;
-    const reader = new FileReader();
-    reader.onload = e => {
-      imgBase64 = e.target.result;
-      const drop = document.getElementById('imgDrop');
-      drop.innerHTML = `<img src="${imgBase64}" style="max-height:120px;border-radius:8px;"><br>点击更换图片<input type="file" accept="image/*" id="imgInput" style="display:none">`;
-      setupImgDrop();
-    };
-    reader.readAsDataURL(file);
-  }
-
-  document.getElementById('charModalSave').onclick = async () => {
-    const name = document.getElementById('charName').value.trim();
-    if (!name) return alert('请输入角色名');
-    const body = {
-      name,
-      description: document.getElementById('charDesc').value.trim(),
-      definition: document.getElementById('charDef').value.trim(),
-      tags: document.getElementById('charTags').value.split(',').map(s => s.trim()).filter(Boolean)
-    };
-    if (imgBase64) body.image = imgBase64;
-    try {
-      const res = await fetch(`${API}/rooms/yang/characters`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
-      });
-      const data = await res.json();
-      if (data.success) {
-        // Upload image separately if large
-        if (imgBase64 && data.char && data.char.id) {
-          await fetch(`${API}/rooms/yang/characters/${data.char.id}/image`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ image: imgBase64 })
-          });
-        }
-        charModal.classList.remove('active');
-        loadGallery();
-      }
-    } catch (e) {
-      alert('保存失败: ' + e.message);
-    }
-  };
-
-  // ===== Import Save Modal =====
-  const saveModal = document.getElementById('saveModal');
-  let jsonlContent = '';
-
-  document.getElementById('addSaveBtn').onclick = () => {
-    saveModal.classList.add('active');
-    jsonlContent = '';
-    ['saveTitle','saveSummary','saveJsonl'].forEach(id => document.getElementById(id).value = '');
-    document.getElementById('jsonlDrop').innerHTML = '拖拽 .jsonl 聊天记录到这里，或点击选择文件<input type="file" accept=".jsonl,.json,.txt" id="jsonlInput" style="display:none">';
-    setupJsonlDrop();
-  };
-  document.getElementById('saveModalClose').onclick = () => saveModal.classList.remove('active');
-
-  function setupJsonlDrop() {
-    const drop = document.getElementById('jsonlDrop');
-    const input = document.getElementById('jsonlInput');
-    drop.onclick = () => input.click();
-    drop.ondragover = e => { e.preventDefault(); drop.classList.add('dragover'); };
-    drop.ondragleave = () => drop.classList.remove('dragover');
-    drop.ondrop = e => {
-      e.preventDefault();
-      drop.classList.remove('dragover');
-      handleJsonlFile(e.dataTransfer.files[0]);
-    };
-    input.onchange = () => { if (input.files[0]) handleJsonlFile(input.files[0]); };
-  }
-
-  function handleJsonlFile(file) {
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = e => {
-      jsonlContent = e.target.result;
-      document.getElementById('saveJsonl').value = jsonlContent;
-      document.getElementById('jsonlDrop').innerHTML = `✓ 已读取 ${file.name}<input type="file" accept=".jsonl,.json,.txt" id="jsonlInput" style="display:none">`;
-      setupJsonlDrop();
-    };
-    reader.readAsText(file);
-  }
-
-  document.getElementById('saveModalSave').onclick = async () => {
-    const title = document.getElementById('saveTitle').value.trim();
-    const jsonl = document.getElementById('saveJsonl').value.trim() || jsonlContent;
-    if (!title) return alert('请输入存档标题');
-    if (!jsonl) return alert('请提供聊天记录');
-    try {
-      const res = await fetch(`${API}/rooms/yang/characters/${currentCharId}/import-jsonl`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          title,
-          summary: document.getElementById('saveSummary').value.trim(),
-          jsonl
-        })
-      });
-      const data = await res.json();
-      if (data.success) {
-        saveModal.classList.remove('active');
-        loadSaves(currentCharId);
-      } else {
-        alert('导入失败: ' + (data.error || ''));
-      }
-    } catch (e) {
-      alert('导入失败: ' + e.message);
-    }
-  };
-
-  // ===== Utils =====
-  function esc(str) {
-    if (!str) return '';
-    const d = document.createElement('div');
-    d.textContent = str;
-    return d.innerHTML;
-  }
-
-  // ===== Init =====
-  loadGallery();
-})();
+// ===== Init =====
+loadGallery();
 </script>
 </body>
 </html>
