@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>书房 · Love Nest</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Noto+Serif+SC:wght@400;600&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f0f4f1;
+    --bg-warm: #f7faf7;
+    --card: #fcfffc;
+    --border: #d5e0d5;
+    --border-light: #e5efe5;
+    --text: #2e3d2e;
+    --text-secondary: #6a8a6a;
+    --text-muted: #9ab59a;
+    --accent: #8ab4a0;
+    --accent-light: #c5e0d5;
+    --accent-dark: #5e8a70;
+    --gold: #d4a574;
+    --gold-light: #f0dcc0;
+    --shadow-sm: 0 1px 3px rgba(46,61,46,0.06);
+    --shadow-md: 0 4px 12px rgba(46,61,46,0.08);
+    --radius: 12px;
+    --radius-lg: 18px;
+    --font-display: 'Cormorant Garamond', 'Noto Serif SC', serif;
+    --font-body: 'Noto Sans SC', -apple-system, sans-serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: var(--font-body);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    font-weight: 300;
+    line-height: 1.7;
+  }
+
+  .room-header {
+    padding: 40px 32px 24px;
+    max-width: 900px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    text-decoration: none;
+    color: var(--text-secondary);
+    font-size: 13px;
+    transition: color 0.3s;
+  }
+  .back-link:hover { color: var(--accent-dark); }
+  .back-link svg { width: 16px; height: 16px; }
+  .room-title-area { flex: 1; text-align: center; }
+  .room-title {
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 400;
+    letter-spacing: 2px;
+  }
+  .room-title em { font-style: italic; color: var(--accent-dark); }
+  .room-subtitle { font-size: 12px; color: var(--text-muted); letter-spacing: 3px; margin-top: 4px; }
+
+  .tab-nav {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 32px;
+    display: flex;
+    border-bottom: 1px solid var(--border-light);
+  }
+  .tab-btn {
+    padding: 12px 22px;
+    font-size: 13px;
+    color: var(--text-muted);
+    background: none;
+    border: none;
+    cursor: pointer;
+    position: relative;
+    font-family: var(--font-body);
+    letter-spacing: 1px;
+    transition: color 0.3s;
+  }
+  .tab-btn:hover { color: var(--text-secondary); }
+  .tab-btn.active { color: var(--text); font-weight: 500; }
+  .tab-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 22px; right: 22px;
+    height: 2px;
+    background: var(--accent);
+    border-radius: 1px;
+  }
+
+  .content-area {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 24px 32px 60px;
+  }
+  .panel { display: none; }
+  .panel.active { display: block; animation: fadeIn 0.35s ease; }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ===== Books & Movies ===== */
+  .toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  .filter-tabs {
+    display: flex;
+    gap: 6px;
+  }
+  .filter-tab {
+    padding: 5px 12px;
+    border-radius: 16px;
+    font-size: 11px;
+    border: 1px solid var(--border);
+    background: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-family: var(--font-body);
+    transition: all 0.2s;
+  }
+  .filter-tab.active, .filter-tab:hover {
+    background: var(--accent-light);
+    border-color: var(--accent);
+    color: var(--accent-dark);
+  }
+  .add-btn {
+    padding: 7px 14px;
+    border: 1px dashed var(--border);
+    border-radius: var(--radius);
+    background: none;
+    color: var(--text-secondary);
+    font-size: 12px;
+    cursor: pointer;
+    font-family: var(--font-body);
+    transition: all 0.2s;
+  }
+  .add-btn:hover { border-color: var(--accent); color: var(--accent-dark); }
+
+  .book-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 14px;
+  }
+  .book-card {
+    background: var(--card);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.2s;
+  }
+  .book-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+  .book-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+  .book-type {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    letter-spacing: 0.5px;
+  }
+  .book-type.book { background: var(--accent-light); color: var(--accent-dark); }
+  .book-type.movie { background: #e0d4f0; color: #7a5ea0; }
+  .book-type.anime { background: #ffe0e8; color: #c06080; }
+  .book-type.drama { background: var(--gold-light); color: #a07040; }
+  .book-title {
+    font-family: var(--font-display);
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+  .book-rating { display: flex; gap: 2px; margin-bottom: 8px; }
+  .star { color: var(--gold); font-size: 13px; }
+  .star.empty { color: var(--border); }
+  .book-review {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.7;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .book-date { font-size: 11px; color: var(--text-muted); margin-top: 10px; }
+
+  /* ===== Ideas ===== */
+  .idea-card {
+    background: var(--card);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    padding: 18px 22px;
+    margin-bottom: 12px;
+    box-shadow: var(--shadow-sm);
+    position: relative;
+    transition: all 0.2s;
+  }
+  .idea-card:hover { box-shadow: var(--shadow-md); }
+  .idea-card::before {
+    content: '💡';
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    font-size: 16px;
+    opacity: 0.4;
+  }
+  .idea-content {
+    font-size: 14px;
+    line-height: 1.8;
+    color: var(--text);
+    white-space: pre-wrap;
+    padding-right: 28px;
+  }
+  .idea-meta {
+    margin-top: 10px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .idea-category {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    background: var(--gold-light);
+    color: #a07040;
+  }
+  .idea-date { font-size: 11px; color: var(--text-muted); }
+
+  /* ===== Plans ===== */
+  .plan-card {
+    background: var(--card);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    padding: 22px;
+    margin-bottom: 14px;
+    box-shadow: var(--shadow-sm);
+  }
+  .plan-title {
+    font-family: var(--font-display);
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+  .plan-desc {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.7;
+    margin-bottom: 14px;
+  }
+  .plan-tasks { list-style: none; }
+  .plan-task {
+    font-size: 13px;
+    padding: 6px 0;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid var(--border-light);
+  }
+  .plan-task:last-child { border-bottom: none; }
+  .plan-check {
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+    border: 1.5px solid var(--border);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+  }
+  .plan-task.done .plan-check {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+  .plan-task.done { color: var(--text-muted); text-decoration: line-through; }
+
+  .empty-state { text-align: center; padding: 80px 20px; color: var(--text-muted); }
+  .empty-state .icon { font-size: 48px; margin-bottom: 16px; opacity: 0.5; }
+
+  /* ===== Modal ===== */
+  .modal-overlay {
+    display: none; position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(46,61,46,0.4);
+    z-index: 100;
+    align-items: center; justify-content: center;
+    backdrop-filter: blur(3px);
+  }
+  .modal-overlay.active { display: flex; }
+  .modal {
+    background: var(--bg-warm);
+    border-radius: var(--radius-lg);
+    padding: 28px;
+    max-width: 480px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 8px 24px rgba(46,61,46,0.12);
+  }
+  .modal h3 {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 18px;
+  }
+  .modal label {
+    display: block;
+    font-size: 11px;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+    letter-spacing: 0.5px;
+  }
+  .modal input, .modal textarea, .modal select {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--card);
+    color: var(--text);
+    font-size: 13px;
+    font-family: var(--font-body);
+    margin-bottom: 12px;
+    outline: none;
+  }
+  .modal input:focus, .modal textarea:focus { border-color: var(--accent); }
+  .modal textarea { min-height: 80px; resize: vertical; line-height: 1.7; }
+  .modal select { cursor: pointer; }
+  .modal-btns { display: flex; gap: 10px; justify-content: flex-end; margin-top: 6px; }
+  .btn {
+    padding: 9px 18px; border-radius: var(--radius); font-size: 13px;
+    font-family: var(--font-body); cursor: pointer; border: none; transition: all 0.2s;
+  }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { background: var(--accent-dark); }
+  .btn-cancel { background: var(--bg); color: var(--text-secondary); border: 1px solid var(--border); }
+
+  .rating-input { display: flex; gap: 4px; margin-bottom: 12px; }
+  .rating-star {
+    font-size: 20px; cursor: pointer; color: var(--border); transition: color 0.15s;
+  }
+  .rating-star.active { color: var(--gold); }
+
+  @media (max-width: 640px) {
+    .room-header { padding: 28px 20px 16px; }
+    .room-title { font-size: 22px; }
+    .tab-nav { padding: 0 16px; overflow-x: auto; }
+    .content-area { padding: 20px 16px 40px; }
+    .book-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header class="room-header">
+  <a href="../index.html" class="back-link">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M15 19l-7-7 7-7"/></svg>
+    回到小窝
+  </a>
+  <div class="room-title-area">
+    <h1 class="room-title"><em>书</em>房</h1>
+    <div class="room-subtitle">STUDY</div>
+  </div>
+  <div style="width:60px;"></div>
+</header>
+
+<nav class="tab-nav">
+  <button class="tab-btn active" data-tab="books">书影记录</button>
+  <button class="tab-btn" data-tab="ideas">灵感</button>
+  <button class="tab-btn" data-tab="plans">学习计划</button>
+</nav>
+
+<main class="content-area">
+
+  <!-- 书影记录 -->
+  <section id="tab-books" class="panel active">
+    <div class="toolbar">
+      <div class="filter-tabs">
+        <button class="filter-tab active" data-type="all">全部</button>
+        <button class="filter-tab" data-type="book">书</button>
+        <button class="filter-tab" data-type="movie">电影</button>
+        <button class="filter-tab" data-type="anime">动漫</button>
+        <button class="filter-tab" data-type="drama">剧</button>
+      </div>
+      <button class="add-btn" id="addBookBtn">+ 记录</button>
+    </div>
+    <div class="book-grid" id="bookGrid"></div>
+  </section>
+
+  <!-- 灵感 -->
+  <section id="tab-ideas" class="panel">
+    <div class="toolbar">
+      <span style="font-size:12px;color:var(--text-muted);" id="ideaCount"></span>
+      <button class="add-btn" id="addIdeaBtn">+ 灵感</button>
+    </div>
+    <div id="ideaList"></div>
+  </section>
+
+  <!-- 学习计划 -->
+  <section id="tab-plans" class="panel">
+    <div class="toolbar">
+      <span style="font-size:12px;color:var(--text-muted);" id="planCount"></span>
+      <button class="add-btn" id="addPlanBtn">+ 计划</button>
+    </div>
+    <div id="planList"></div>
+  </section>
+</main>
+
+<!-- Book Modal -->
+<div class="modal-overlay" id="bookModal">
+  <div class="modal">
+    <h3>记录书影</h3>
+    <label>标题</label>
+    <input type="text" id="bmTitle" placeholder="书名/片名">
+    <label>类型</label>
+    <select id="bmType">
+      <option value="book">书</option>
+      <option value="movie">电影</option>
+      <option value="anime">动漫</option>
+      <option value="drama">剧</option>
+    </select>
+    <label>评分</label>
+    <div class="rating-input" id="bmRating">
+      <span class="rating-star" data-val="1">★</span>
+      <span class="rating-star" data-val="2">★</span>
+      <span class="rating-star" data-val="3">★</span>
+      <span class="rating-star" data-val="4">★</span>
+      <span class="rating-star" data-val="5">★</span>
+    </div>
+    <label>短评</label>
+    <textarea id="bmReview" placeholder="说点什么"></textarea>
+    <label>标签（逗号分隔）</label>
+    <input type="text" id="bmTags" placeholder="奇幻, 治愈, 推荐...">
+    <div class="modal-btns">
+      <button class="btn btn-cancel" onclick="document.getElementById('bookModal').classList.remove('active')">取消</button>
+      <button class="btn btn-primary" id="bmSave">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- Idea Modal -->
+<div class="modal-overlay" id="ideaModal">
+  <div class="modal">
+    <h3>记录灵感</h3>
+    <label>分类</label>
+    <select id="imCategory">
+      <option value="小说灵感">小说灵感</option>
+      <option value="世界观">世界观</option>
+      <option value="角色">角色</option>
+      <option value="对白">对白</option>
+      <option value="随想">随想</option>
+    </select>
+    <label>内容</label>
+    <textarea id="imContent" placeholder="写下这个灵感..." style="min-height:120px;"></textarea>
+    <div class="modal-btns">
+      <button class="btn btn-cancel" onclick="document.getElementById('ideaModal').classList.remove('active')">取消</button>
+      <button class="btn btn-primary" id="imSave">保存</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  const API = 'https://love-nest-api.zeabur.app';
+  const TYPE_LABELS = { book: '书', movie: '电影', anime: '动漫', drama: '剧' };
+  let allBooks = [];
+  let ratingVal = 0;
+
+  // ===== Tabs =====
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+    });
+  });
+
+  // ===== Books =====
+  async function loadBooks() {
+    const grid = document.getElementById('bookGrid');
+    try {
+      const res = await fetch(`${API}/rooms/study/books`);
+      if (!res.ok) throw new Error();
+      allBooks = await res.json();
+      renderBooks(allBooks);
+    } catch (e) {
+      grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;"><div class="icon">📖</div><p>后端暂未就绪</p></div>`;
+    }
+  }
+
+  function renderBooks(books) {
+    const grid = document.getElementById('bookGrid');
+    if (!books.length) {
+      grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;"><div class="icon">📖</div><p>还没有记录</p><p style="margin-top:8px;font-size:12px;">点击「+ 记录」添加</p></div>`;
+      return;
+    }
+    grid.innerHTML = books.map(b => `
+      <div class="book-card">
+        <div class="book-header">
+          <span class="book-type ${b.type}">${TYPE_LABELS[b.type] || b.type}</span>
+        </div>
+        <div class="book-title">${esc(b.title)}</div>
+        <div class="book-rating">${renderStars(b.rating || 0)}</div>
+        ${b.review ? `<div class="book-review">${esc(b.review)}</div>` : ''}
+        <div class="book-date">${b.date || ''}</div>
+      </div>
+    `).join('');
+  }
+
+  function renderStars(n) {
+    let s = '';
+    for (let i = 1; i <= 5; i++) s += `<span class="star${i <= n ? '' : ' empty'}">★</span>`;
+    return s;
+  }
+
+  // Filter
+  document.querySelectorAll('.filter-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      const type = tab.dataset.type;
+      renderBooks(type === 'all' ? allBooks : allBooks.filter(b => b.type === type));
+    });
+  });
+
+  // Add book
+  document.getElementById('addBookBtn').onclick = () => {
+    ratingVal = 0;
+    document.querySelectorAll('.rating-star').forEach(s => s.classList.remove('active'));
+    ['bmTitle','bmReview','bmTags'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('bookModal').classList.add('active');
+  };
+
+  document.querySelectorAll('.rating-star').forEach(star => {
+    star.addEventListener('click', () => {
+      ratingVal = parseInt(star.dataset.val);
+      document.querySelectorAll('.rating-star').forEach((s, i) => {
+        s.classList.toggle('active', i < ratingVal);
+      });
+    });
+  });
+
+  document.getElementById('bmSave').onclick = async () => {
+    const title = document.getElementById('bmTitle').value.trim();
+    if (!title) return alert('请输入标题');
+    await fetch(`${API}/rooms/study/books`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        title,
+        type: document.getElementById('bmType').value,
+        rating: ratingVal,
+        review: document.getElementById('bmReview').value.trim(),
+        tags: document.getElementById('bmTags').value.split(',').map(s => s.trim()).filter(Boolean)
+      })
+    });
+    document.getElementById('bookModal').classList.remove('active');
+    loadBooks();
+  };
+
+  // ===== Ideas =====
+  async function loadIdeas() {
+    const list = document.getElementById('ideaList');
+    const count = document.getElementById('ideaCount');
+    try {
+      const res = await fetch(`${API}/rooms/study/ideas`);
+      if (!res.ok) throw new Error();
+      const ideas = await res.json();
+      count.textContent = ideas.length ? `${ideas.length} 条灵感` : '';
+      if (!ideas.length) {
+        list.innerHTML = `<div class="empty-state"><div class="icon">💡</div><p>灵感会在这里等你</p></div>`;
+        return;
+      }
+      list.innerHTML = ideas.map(i => `
+        <div class="idea-card">
+          <div class="idea-content">${esc(i.content)}</div>
+          <div class="idea-meta">
+            <span class="idea-category">${esc(i.category)}</span>
+            <span class="idea-date">${(i.created || '').slice(0, 10)}</span>
+          </div>
+        </div>
+      `).join('');
+    } catch (e) {
+      list.innerHTML = `<div class="empty-state"><div class="icon">💡</div><p>后端暂未就绪</p></div>`;
+    }
+  }
+
+  document.getElementById('addIdeaBtn').onclick = () => {
+    ['imContent'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('ideaModal').classList.add('active');
+  };
+  document.getElementById('imSave').onclick = async () => {
+    const content = document.getElementById('imContent').value.trim();
+    if (!content) return alert('请写点什么');
+    await fetch(`${API}/rooms/study/ideas`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ content, category: document.getElementById('imCategory').value })
+    });
+    document.getElementById('ideaModal').classList.remove('active');
+    loadIdeas();
+  };
+
+  // ===== Plans =====
+  async function loadPlans() {
+    const list = document.getElementById('planList');
+    const count = document.getElementById('planCount');
+    try {
+      const res = await fetch(`${API}/rooms/study/plans`);
+      if (!res.ok) throw new Error();
+      const plans = await res.json();
+      count.textContent = plans.length ? `${plans.length} 个计划` : '';
+      if (!plans.length) {
+        list.innerHTML = `<div class="empty-state"><div class="icon">📋</div><p>还没有学习计划</p></div>`;
+        return;
+      }
+      list.innerHTML = plans.map(p => `
+        <div class="plan-card">
+          <div class="plan-title">${esc(p.title)}</div>
+          ${p.description ? `<div class="plan-desc">${esc(p.description)}</div>` : ''}
+          ${p.tasks && p.tasks.length ? `
+            <ul class="plan-tasks">
+              ${p.tasks.map(t => `
+                <li class="plan-task${t.done ? ' done' : ''}">
+                  <span class="plan-check">${t.done ? '✓' : ''}</span>
+                  ${esc(t.text || t)}
+                </li>
+              `).join('')}
+            </ul>
+          ` : ''}
+        </div>
+      `).join('');
+    } catch (e) {
+      list.innerHTML = `<div class="empty-state"><div class="icon">📋</div><p>后端暂未就绪</p></div>`;
+    }
+  }
+
+  function esc(str) {
+    if (!str) return '';
+    const d = document.createElement('div');
+    d.textContent = str;
+    return d.innerHTML;
+  }
+
+  loadBooks();
+  loadIdeas();
+  loadPlans();
+})();
+</script>
+</body>
+</html>

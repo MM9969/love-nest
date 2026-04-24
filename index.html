@@ -791,14 +791,12 @@
       <span class="room-card-desc">日记 · 笔友 · 成长</span>
     </a>
     <a href="rooms/yang.html" class="room-card" data-room="yang">
-      <span class="room-card-badge">施工中</span>
       <span class="room-card-icon">🐑</span>
       <span class="room-card-name">小羊的房间</span>
       <span class="room-card-sub">Yang's Room</span>
       <span class="room-card-desc">RP存档 · 游戏</span>
     </a>
     <a href="rooms/study.html" class="room-card" data-room="study">
-      <span class="room-card-badge">施工中</span>
       <span class="room-card-icon">📖</span>
       <span class="room-card-name">书房</span>
       <span class="room-card-sub">Study</span>
@@ -881,16 +879,14 @@
 
   function updateTimeProgress() {
     const now = new Date();
-    // 用 Intl 拿中国时间各部分，避免 new Date(string) 解析失败
-    const fmt = (opt) => Number(new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Shanghai', ...opt }).format(now));
-    const hours = fmt({ hour: 'numeric', hour12: false });
-    const minutes = fmt({ minute: 'numeric' });
-    const seconds = fmt({ second: 'numeric' });
+    const hours = now.getHours();
+    const minutes = now.getMinutes();
+    const seconds = now.getSeconds();
     digitalTime.textContent = `${String(hours).padStart(2,'0')}:${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}`;
     
-    // Calculate 24-hour progress percentage
+    // 一天86400秒，当前过了多少秒就是多少百分比
     const totalSeconds = hours * 3600 + minutes * 60 + seconds;
-    const percentage = (totalSeconds / 86400) * 100; // 86400 seconds in a day
+    const percentage = (totalSeconds / 86400) * 100;
     progressFill.style.width = percentage + '%';
   }
 

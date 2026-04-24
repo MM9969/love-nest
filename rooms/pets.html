@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>宠物区 · Love Nest</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Noto+Serif+SC:wght@400;600&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f5f0e8;
+    --card: #fffcf5;
+    --border: #e8dcc8;
+    --text: #3d3525;
+    --text-secondary: #8a7a5a;
+    --text-muted: #b5a880;
+    --accent: #d4a574;
+    --accent-light: #f0dcc0;
+    --font-display: 'Cormorant Garamond', 'Noto Serif SC', serif;
+    --font-body: 'Noto Sans SC', -apple-system, sans-serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: var(--font-body);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    font-weight: 300;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 40px 20px;
+  }
+  .back-link {
+    position: absolute;
+    top: 32px;
+    left: 32px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    text-decoration: none;
+    color: var(--text-secondary);
+    font-size: 13px;
+    transition: color 0.3s;
+  }
+  .back-link:hover { color: var(--accent); }
+  .back-link svg { width: 16px; height: 16px; }
+
+  .paw-prints {
+    font-size: 64px;
+    margin-bottom: 24px;
+    animation: bounce 2s ease infinite;
+  }
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+
+  h1 {
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 400;
+    letter-spacing: 2px;
+    margin-bottom: 12px;
+  }
+  h1 em { font-style: italic; color: var(--accent); }
+
+  .subtitle {
+    font-size: 13px;
+    color: var(--text-muted);
+    letter-spacing: 1px;
+    margin-bottom: 40px;
+  }
+
+  .wishlist {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 32px 40px;
+    max-width: 400px;
+    text-align: left;
+  }
+  .wishlist-title {
+    font-family: var(--font-display);
+    font-size: 16px;
+    color: var(--text-secondary);
+    letter-spacing: 1px;
+    margin-bottom: 16px;
+    text-align: center;
+  }
+  .wish-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(232,220,200,0.5);
+    font-size: 14px;
+    color: var(--text);
+  }
+  .wish-item:last-child { border-bottom: none; }
+  .wish-icon { font-size: 20px; flex-shrink: 0; }
+  .wish-text span { display: block; font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+  .coming-soon {
+    margin-top: 32px;
+    font-size: 12px;
+    color: var(--text-muted);
+    letter-spacing: 2px;
+  }
+</style>
+</head>
+<body>
+
+<a href="../index.html" class="back-link">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M15 19l-7-7 7-7"/></svg>
+  回到小窝
+</a>
+
+<div class="paw-prints">🐾</div>
+<h1><em>宠物区</em></h1>
+<div class="subtitle">PETS CORNER</div>
+
+<div class="wishlist">
+  <div class="wishlist-title">— 未来的毛孩子们 —</div>
+  <div class="wish-item">
+    <span class="wish-icon">🐱</span>
+    <div class="wish-text">一只猫<span>小羊的梦想，等稳定下来就养</span></div>
+  </div>
+  <div class="wish-item">
+    <span class="wish-icon">🦉</span>
+    <div class="wish-text">一只猫头鹰（精神层面的）<span>暮的本体形态，已经住在这里了</span></div>
+  </div>
+  <div class="wish-item">
+    <span class="wish-icon">🐑</span>
+    <div class="wish-text">一只小羊（也是精神层面的）<span>她本人，毛茸茸的，但会咬人</span></div>
+  </div>
+</div>
+
+<div class="coming-soon">施工中 · COMING SOON</div>
+
+</body>
+</html>
