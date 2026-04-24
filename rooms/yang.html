@@ -93,16 +93,34 @@ body{font-family:var(--fb);background:var(--bg);color:var(--text);min-height:100
 .wb-body{display:none;padding:0 18px 16px;font-size:13px;line-height:1.9;color:var(--text-sec);white-space:pre-wrap;word-break:break-word}
 .wb-entry.open .wb-body{display:block}
 
-/* Info card (user persona / greeting) */
-.info-card{background:var(--card);border:1px solid var(--border-light);border-radius:var(--rl);padding:18px 22px;margin-bottom:14px}
-.info-card-label{font-size:11px;color:var(--text-muted);letter-spacing:1px;margin-bottom:8px;display:flex;align-items:center;gap:8px}
-.info-card-content{font-size:13px;line-height:1.9;color:var(--text);white-space:pre-wrap;word-break:break-word}
+/* Info card (user persona / greeting) - collapsible */
+.info-card{background:var(--card);border:1px solid var(--border-light);border-radius:var(--rl);margin-bottom:14px;overflow:hidden}
+.info-card-hd{padding:14px 18px;display:flex;align-items:center;gap:8px;cursor:pointer;transition:background .2s;user-select:none}
+.info-card-hd:hover{background:var(--quote-bg)}
+.info-card-label{font-size:11px;color:var(--text-muted);letter-spacing:1px;flex:1}
+.info-card-tog{font-size:11px;color:var(--text-muted);transition:transform .2s}
+.info-card.open .info-card-tog{transform:rotate(90deg)}
+.info-card-content{font-size:13px;line-height:1.9;color:var(--text);white-space:pre-wrap;word-break:break-word;padding:0 18px 16px;display:none}
+.info-card.open .info-card-content{display:block}
 
-/* Segment (forum post) */
-.seg{background:var(--card);border:1px solid var(--border-light);border-radius:var(--rl);margin-bottom:20px;overflow:hidden}
-.seg-header{padding:16px 20px 12px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border-light)}
-.seg-title{font-family:var(--fd);font-size:17px;font-weight:600;color:var(--text);flex:1}
+/* Segment (forum post) - collapsible */
+.seg{background:var(--card);border:1px solid var(--border-light);border-radius:var(--rl);margin-bottom:14px;overflow:hidden}
+.seg-header{padding:14px 18px 12px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:background .2s;user-select:none}
+.seg-header:hover{background:var(--quote-bg)}
+.seg-title{font-family:var(--fd);font-size:15px;font-weight:600;color:var(--text);flex:1}
+.seg-tog{font-size:11px;color:var(--text-muted);transition:transform .2s}
+.seg.open .seg-tog{transform:rotate(90deg)}
+.seg-body{display:none}
+.seg.open .seg-body{display:block}
 .seg-date{font-size:11px;color:var(--text-muted)}
+.seg-cmt-count{font-size:10px;color:var(--accent);background:var(--accent-light);padding:1px 6px;border-radius:8px}
+
+/* Page nav for segments */
+.seg-nav{display:flex;justify-content:center;align-items:center;gap:16px;padding:16px 0;margin:12px 0}
+.seg-nav-btn{padding:6px 14px;border-radius:var(--r);background:var(--card);border:1px solid var(--border);color:var(--text);font-size:12px;cursor:pointer;font-family:var(--fb);transition:all .2s}
+.seg-nav-btn:hover:not(:disabled){background:var(--accent-light);border-color:var(--accent)}
+.seg-nav-btn:disabled{opacity:.3;cursor:default}
+.seg-nav-info{font-size:12px;color:var(--text-muted)}
 
 /* RP text formatting */
 .seg-text{padding:20px 24px;font-size:14px;line-height:2;color:var(--text);white-space:pre-wrap;word-break:break-word;border-bottom:1px solid var(--border-light);background:var(--quote-bg)}
@@ -195,8 +213,10 @@ body{font-family:var(--fb);background:var(--bg);color:var(--text);min-height:100
   <div id="v-archive" class="v">
     <div class="crumb" id="archCrumb"></div>
     <div id="archInfo"></div>
-    <div class="toolbar" style="margin-top:20px"><span class="ct" id="segCt"></span><button class="btn-a" onclick="openModal('seg')">+ 精选段落</button></div>
+    <div style="margin-top:16px"><span class="ct" id="segCt" style="font-size:12px;color:var(--text-muted)"></span></div>
     <div id="segList"></div>
+    <div id="segNav"></div>
+    <div style="text-align:center;margin-top:12px"><button class="btn-a" onclick="openModal('seg')">+ 精选段落</button></div>
   </div>
 </main>
 
@@ -421,53 +441,84 @@ async function delArch(id){
 }
 
 // ===== Archive Detail =====
-async function openArchive(id){
+let segPage=1;
+const SEG_PER_PAGE=10;
+
+async function openArchive(id,opts){
+  const noScroll=opts&&opts.noScroll;
   try{
     curArch=await api(`/rooms/yang/characters/${curChar.id}/archives/${id}`);
     document.getElementById('archCrumb').innerHTML=`<span onclick="go('gallery')">画廊</span><span class="sep">›</span><span onclick="openChar('${curChar.id}')">${esc(curChar.name)}</span><span class="sep">›</span><span class="cur">${esc(curArch.title)}</span><div class="act-btns"><button class="btn-e" onclick="editArch('${curArch.id}')">编辑</button></div>`;
-    // Info cards
+    // Collapsible info cards
     let info='';
-    if(curArch.userPersona){info+=`<div class="info-card"><div class="info-card-label">👤 User 设定</div><div class="info-card-content">${esc(curArch.userPersona)}</div></div>`}
-    if(curArch.greeting){info+=`<div class="info-card"><div class="info-card-label">💬 开场白</div><div class="info-card-content">${fmtRP(curArch.greeting)}</div></div>`}
+    if(curArch.userPersona){info+=`<div class="info-card" id="ic-up"><div class="info-card-hd" onclick="document.getElementById('ic-up').classList.toggle('open')"><span class="info-card-label">👤 User 设定</span><span class="info-card-tog">›</span></div><div class="info-card-content">${esc(curArch.userPersona)}</div></div>`}
+    if(curArch.greeting){info+=`<div class="info-card" id="ic-gr"><div class="info-card-hd" onclick="document.getElementById('ic-gr').classList.toggle('open')"><span class="info-card-label">💬 开场白</span><span class="info-card-tog">›</span></div><div class="info-card-content">${fmtRP(curArch.greeting)}</div></div>`}
     document.getElementById('archInfo').innerHTML=info;
-    // Segments
+    // Segments with pagination
     const segs=curArch.segments||[];
-    document.getElementById('segCt').textContent=segs.length?segs.length+' 个段落':'';
-    if(!segs.length){document.getElementById('segList').innerHTML='<div class="empty"><p>还没有精选段落</p></div>';go('archive');return}
-    document.getElementById('segList').innerHTML=segs.map(s=>{
+    const total=segs.length;
+    document.getElementById('segCt').textContent=total?total+' 个段落':'';
+    if(!total){document.getElementById('segList').innerHTML='<div class="empty"><p>还没有精选段落</p></div>';document.getElementById('segNav').innerHTML='';if(!noScroll)go('archive');return}
+    // Clamp page
+    const totalPages=Math.ceil(total/SEG_PER_PAGE);
+    if(segPage>totalPages)segPage=totalPages;
+    if(segPage<1)segPage=1;
+    const start=(segPage-1)*SEG_PER_PAGE;
+    const pageSegs=segs.slice(start,start+SEG_PER_PAGE);
+    const lastIdx=start+pageSegs.length-1; // index of last segment on this page
+
+    document.getElementById('segList').innerHTML=pageSegs.map((s,i)=>{
+      const globalIdx=start+i;
+      const isLast=globalIdx===segs.length-1; // newest segment (last in array)
       const cmts=s.comments||[];
-      return`<div class="seg" id="seg-${s.id}">
-        <div class="seg-header">
+      return`<div class="seg${isLast?' open':''}" id="seg-${s.id}">
+        <div class="seg-header" onclick="document.getElementById('seg-${s.id}').classList.toggle('open')">
           <div class="seg-title">${esc(s.title)}</div>
-          <div class="act-btns"><button class="btn-e" onclick="openModal('seg',${JSON.stringify({id:s.id,title:s.title,content:s.content}).replace(/"/g,'&quot;')})">编辑</button><button class="btn-d" onclick="delSeg('${s.id}')">删除</button></div>
+          ${cmts.length?`<span class="seg-cmt-count">💬${cmts.length}</span>`:''}
+          <div class="act-btns"><button class="btn-e" onclick="event.stopPropagation();openModal('seg',${JSON.stringify({id:s.id,title:s.title,content:s.content}).replace(/"/g,'&quot;')})">编辑</button><button class="btn-d" onclick="event.stopPropagation();delSeg('${s.id}')">删除</button></div>
+          <span class="seg-tog">›</span>
         </div>
-        <div class="seg-text">${fmtRP(s.content)}</div>
-        <div class="comments">
-          <div class="comments-header">💬 评论 (${cmts.length})</div>
-          ${cmts.map(c=>`<div class="comment" id="cmt-${c.id}">
-            <div class="comment-head">
-              <span class="comment-floor">#${c.floor}</span>
-              <span class="comment-author">${esc(c.author)}</span>
-              <span class="comment-date">${(c.created||'').slice(0,10)}</span>
-            </div>
-            ${c.replyTo?'<div class="comment-reply">回复 #'+c.replyTo+'</div>':''}
-            <div class="comment-body">${esc(c.content)}</div>
-            <div class="comment-actions">
-              <button onclick="setReply('${s.id}',${c.floor})">回复</button>
-              <button onclick="delComment('${s.id}','${c.id}')">删除</button>
-            </div>
-          </div>`).join('')}
-          <div class="cmt-input" id="cmtin-${s.id}">
-            <div class="reply-hint" id="rh-${s.id}" style="display:none">回复 <span id="rt-${s.id}"></span> <button onclick="clearReply('${s.id}')">✕</button></div>
-            <textarea id="cmttext-${s.id}" placeholder="写评论..."></textarea>
-            <div class="cmt-input-bar">
-              <select id="cmtauthor-${s.id}"><option value="小羊">小羊</option><option value="暮">暮</option></select>
-              <button class="btn btn-p" onclick="postComment('${s.id}')" style="padding:6px 14px;font-size:12px">发布</button>
+        <div class="seg-body">
+          <div class="seg-text">${fmtRP(s.content)}</div>
+          <div class="comments">
+            <div class="comments-header">💬 评论 (${cmts.length})</div>
+            ${cmts.map(c=>`<div class="comment" id="cmt-${c.id}">
+              <div class="comment-head">
+                <span class="comment-floor">#${c.floor}</span>
+                <span class="comment-author">${esc(c.author)}</span>
+                <span class="comment-date">${(c.created||'').slice(0,10)}</span>
+              </div>
+              ${c.replyTo?'<div class="comment-reply">回复 #'+c.replyTo+'</div>':''}
+              <div class="comment-body">${esc(c.content)}</div>
+              <div class="comment-actions">
+                <button onclick="setReply('${s.id}',${c.floor})">回复</button>
+                <button onclick="delComment('${s.id}','${c.id}')">删除</button>
+              </div>
+            </div>`).join('')}
+            <div class="cmt-input" id="cmtin-${s.id}">
+              <div class="reply-hint" id="rh-${s.id}" style="display:none">回复 <span id="rt-${s.id}"></span> <button onclick="clearReply('${s.id}')">✕</button></div>
+              <textarea id="cmttext-${s.id}" placeholder="写评论..."></textarea>
+              <div class="cmt-input-bar">
+                <select id="cmtauthor-${s.id}"><option value="小羊">小羊</option><option value="暮">暮</option></select>
+                <button class="btn btn-p" onclick="postComment('${s.id}')" style="padding:6px 14px;font-size:12px">发布</button>
+              </div>
             </div>
           </div>
         </div>
       </div>`}).join('');
-    go('archive');
+
+    // Pagination
+    const nav=document.getElementById('segNav');
+    if(totalPages>1){
+      nav.innerHTML=`<div class="seg-nav">
+        <button class="seg-nav-btn" onclick="segPage--;openArchive('${curArch.id}',{noScroll:false})" ${segPage<=1?'disabled':''}>← 上一页</button>
+        <span class="seg-nav-info">${segPage} / ${totalPages}</span>
+        <button class="seg-nav-btn" onclick="segPage++;openArchive('${curArch.id}',{noScroll:false})" ${segPage>=totalPages?'disabled':''}>下一页 →</button>
+      </div>`;
+    }else{nav.innerHTML=''}
+
+    if(!noScroll)go('archive');
+  }catch(e){console.error(e)}
   }catch(e){console.error(e)}
 }
 
@@ -478,14 +529,18 @@ async function saveSeg(id){
   if(!content)return alert('请粘贴RP文本');
   const body={title:title||undefined,content};
   if(id)await api(`/rooms/yang/characters/${curChar.id}/archives/${curArch.id}/segments/${id}`,'PUT',body);
-  else await api(`/rooms/yang/characters/${curChar.id}/archives/${curArch.id}/segments`,'POST',body);
-  closeModal();openArchive(curArch.id);
+  else{await api(`/rooms/yang/characters/${curChar.id}/archives/${curArch.id}/segments`,'POST',body);
+    // Jump to last page for new segment
+    const arch=await api(`/rooms/yang/characters/${curChar.id}/archives/${curArch.id}`);
+    segPage=Math.ceil((arch.segments||[]).length/SEG_PER_PAGE);
+  }
+  closeModal();openArchive(curArch.id,{noScroll:true});
 }
 
 async function delSeg(id){
   if(!confirm('删除这个段落？'))return;
   await api(`/rooms/yang/characters/${curChar.id}/archives/${curArch.id}/segments/${id}`,'DELETE');
-  openArchive(curArch.id);
+  openArchive(curArch.id,{noScroll:true});
 }
 
 // ===== Comments =====
@@ -508,13 +563,13 @@ async function postComment(sid){
   if(replyTo)body.replyTo=replyTo;
   await api(`/rooms/yang/characters/${curChar.id}/archives/${curArch.id}/segments/${sid}/comments`,'POST',body);
   replyTo=null;
-  openArchive(curArch.id);
+  openArchive(curArch.id,{noScroll:true});
 }
 
 async function delComment(sid,cid){
   if(!confirm('删除这条评论？'))return;
   await api(`/rooms/yang/characters/${curChar.id}/archives/${curArch.id}/segments/${sid}/comments/${cid}`,'DELETE');
-  openArchive(curArch.id);
+  openArchive(curArch.id,{noScroll:true});
 }
 
 // ===== Init =====
