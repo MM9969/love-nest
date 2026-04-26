@@ -700,9 +700,241 @@
   .room-card:nth-child(2) { animation-delay: 0.08s; }
   .room-card:nth-child(3) { animation-delay: 0.16s; }
   .room-card:nth-child(4) { animation-delay: 0.24s; }
+
+  /* ===== 通知铃铛 + 最近动态弹窗 ===== */
+  .notify-bell {
+    position: fixed;
+    top: 12px;
+    right: 18px;
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 17px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+    z-index: 100;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .notify-bell:hover {
+    transform: scale(1.08);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+  }
+  .notify-bell:active { transform: scale(0.95); }
+
+  .notify-dot {
+    position: absolute;
+    top: -3px;
+    right: -3px;
+    min-width: 18px;
+    height: 18px;
+    background: #FF6B7A;
+    color: #fff;
+    border-radius: 9px;
+    font-size: 10px;
+    font-weight: 700;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 0 5px;
+    border: 2px solid var(--cream);
+    line-height: 1;
+    animation: dotPulse 2s ease-in-out infinite;
+  }
+  @keyframes dotPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+  }
+
+  .notify-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(119, 92, 85, 0.45);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    backdrop-filter: blur(2px);
+  }
+  .notify-modal.open {
+    display: flex;
+    animation: modalFadeIn 0.2s ease;
+  }
+  @keyframes modalFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .notify-modal-card {
+    background: var(--cream);
+    border-radius: 20px;
+    width: 100%;
+    max-width: 440px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 12px 48px rgba(119, 92, 85, 0.3);
+    animation: modalSlideUp 0.25s ease;
+    overflow: hidden;
+  }
+  @keyframes modalSlideUp {
+    from { transform: translateY(20px) scale(0.96); opacity: 0; }
+    to { transform: translateY(0) scale(1); opacity: 1; }
+  }
+
+  .notify-modal-header {
+    padding: 18px 22px;
+    border-bottom: 1px solid var(--mint);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(135deg, var(--cream) 0%, #F5F0E4 100%);
+  }
+  .notify-modal-header h3 {
+    margin: 0;
+    font-size: 1.05rem;
+    color: var(--choco);
+    font-weight: 600;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .notify-modal-header h3::before { content: '📜'; }
+
+  .notify-close {
+    background: var(--mint);
+    border: none;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--choco);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+  }
+  .notify-close:hover { background: var(--mint-dark); }
+
+  .notify-modal-body {
+    padding: 8px 14px 18px;
+    overflow-y: auto;
+  }
+  .notify-modal-body::-webkit-scrollbar { width: 4px; }
+  .notify-modal-body::-webkit-scrollbar-thumb {
+    background: var(--mint-dark);
+    border-radius: 4px;
+  }
+
+  .changelog-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 12px;
+    border-radius: 12px;
+    position: relative;
+    transition: background 0.2s;
+  }
+  .changelog-item:hover { background: var(--mint); }
+  .changelog-item.is-new {
+    background: var(--pink-light);
+  }
+  .changelog-item.is-new:hover {
+    background: var(--pink);
+  }
+
+  .changelog-icon {
+    font-size: 17px;
+    flex-shrink: 0;
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--mint);
+    border-radius: 50%;
+  }
+  .changelog-item.is-new .changelog-icon {
+    background: rgba(255, 255, 255, 0.7);
+  }
+
+  .changelog-text {
+    flex: 1;
+    min-width: 0;
+  }
+  .changelog-action {
+    font-size: 0.9rem;
+    color: var(--choco);
+    font-weight: 500;
+    word-break: break-word;
+    line-height: 1.4;
+  }
+  .changelog-time {
+    font-size: 0.72rem;
+    color: var(--choco-light);
+    margin-top: 3px;
+    font-family: 'Courier New', monospace;
+  }
+
+  .changelog-new-badge {
+    font-size: 0.65rem;
+    background: #FF6B7A;
+    color: #fff;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-weight: 700;
+    flex-shrink: 0;
+    letter-spacing: 0.5px;
+  }
+
+  .changelog-empty {
+    text-align: center;
+    padding: 50px 20px;
+    color: var(--choco-light);
+    font-size: 0.9rem;
+  }
+  .changelog-empty .empty-emoji {
+    font-size: 32px;
+    display: block;
+    margin-bottom: 10px;
+    opacity: 0.5;
+  }
+
+  @media (max-width: 640px) {
+    .notify-bell { top: 8px; right: 12px; width: 36px; height: 36px; font-size: 15px; }
+  }
 </style>
 </head>
 <body>
+
+<!-- 通知铃铛 -->
+<button class="notify-bell" id="notifyBell" title="最近动态">
+  🔔
+  <span class="notify-dot" id="notifyDot">0</span>
+</button>
+
+<!-- 最近动态弹窗 -->
+<div class="notify-modal" id="changelogModal">
+  <div class="notify-modal-card">
+    <div class="notify-modal-header">
+      <h3>最近动态</h3>
+      <button class="notify-close" id="changelogClose" aria-label="关闭">✕</button>
+    </div>
+    <div class="notify-modal-body" id="changelogList">
+      <div class="changelog-empty">
+        <span class="empty-emoji">📭</span>
+        <div>正在加载...</div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- Header Ribbon -->
 <div class="header-ribbon">
@@ -1177,6 +1409,120 @@
       selectDate(todayStr);
     }
   });
+
+  // ===== 最近动态（changelog 通知）=====
+  let changelogEntries = [];
+  let hasAutoPopped = false;
+
+  function relTime(iso) {
+    if (!iso) return '';
+    const diff = (Date.now() - new Date(iso).getTime()) / 1000;
+    if (diff < 60) return '刚刚';
+    if (diff < 3600) return `${Math.floor(diff / 60)}分钟前`;
+    if (diff < 86400) return `${Math.floor(diff / 3600)}小时前`;
+    if (diff < 86400 * 7) return `${Math.floor(diff / 86400)}天前`;
+    return iso.slice(5, 10);
+  }
+
+  function getLastSeen() {
+    return localStorage.getItem('lastSeenChangelog') || '';
+  }
+
+  function setLastSeen(iso) {
+    localStorage.setItem('lastSeenChangelog', iso);
+  }
+
+  function countUnread() {
+    const lastSeen = getLastSeen();
+    return changelogEntries.filter(e => e.time > lastSeen).length;
+  }
+
+  function updateNotifyDot() {
+    const count = countUnread();
+    const dot = document.getElementById('notifyDot');
+    if (count > 0) {
+      dot.style.display = 'flex';
+      dot.textContent = count > 9 ? '9+' : String(count);
+    } else {
+      dot.style.display = 'none';
+    }
+  }
+
+  function renderChangelog() {
+    const list = document.getElementById('changelogList');
+    if (!changelogEntries.length) {
+      list.innerHTML = `
+        <div class="changelog-empty">
+          <span class="empty-emoji">📭</span>
+          <div>暂时还没有新动态</div>
+        </div>`;
+      return;
+    }
+    const lastSeen = getLastSeen();
+    list.innerHTML = changelogEntries.map(e => {
+      const isNew = e.time > lastSeen;
+      const detail = e.detail ? ` · ${escapeHtml(e.detail)}` : '';
+      return `
+        <div class="changelog-item ${isNew ? 'is-new' : ''}">
+          <span class="changelog-icon">🦉</span>
+          <div class="changelog-text">
+            <div class="changelog-action">${escapeHtml(e.action || '操作')}${detail}</div>
+            <div class="changelog-time">${relTime(e.time)}</div>
+          </div>
+          ${isNew ? '<span class="changelog-new-badge">新</span>' : ''}
+        </div>
+      `;
+    }).join('');
+  }
+
+  async function loadChangelog(canAutoPop) {
+    try {
+      const res = await fetch(`${API_URL}/changelog?n=10`);
+      if (!res.ok) return;
+      const data = await res.json();
+      // entries 从后端按时间正序返回，反转后为最新在前
+      changelogEntries = (data.entries || []).slice().reverse();
+      renderChangelog();
+      updateNotifyDot();
+      if (canAutoPop && !hasAutoPopped && countUnread() > 0) {
+        hasAutoPopped = true;
+        openChangelogModal();
+      }
+    } catch (e) {
+      console.warn('Changelog 暂不可用:', e);
+    }
+  }
+
+  function openChangelogModal() {
+    document.getElementById('changelogModal').classList.add('open');
+  }
+
+  function closeChangelogModal() {
+    document.getElementById('changelogModal').classList.remove('open');
+    // 关闭时把最新条目时间标为已读
+    if (changelogEntries.length) {
+      setLastSeen(changelogEntries[0].time);
+      updateNotifyDot();
+      renderChangelog();
+    }
+  }
+
+  document.getElementById('notifyBell').addEventListener('click', openChangelogModal);
+  document.getElementById('changelogClose').addEventListener('click', closeChangelogModal);
+  document.getElementById('changelogModal').addEventListener('click', (e) => {
+    if (e.target.id === 'changelogModal') closeChangelogModal();
+  });
+  // ESC 关闭
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && document.getElementById('changelogModal').classList.contains('open')) {
+      closeChangelogModal();
+    }
+  });
+
+  // 初次加载（允许自动弹窗）
+  loadChangelog(true);
+  // 每 60 秒静默刷新一次
+  setInterval(() => loadChangelog(false), 60000);
 
 })();
 </script>
