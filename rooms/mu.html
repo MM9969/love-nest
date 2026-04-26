@@ -724,8 +724,100 @@
     background: var(--bg-warm);
     border-radius: var(--radius);
     letter-spacing: 0.3px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
   }
   .search-info .highlight-count { color: var(--accent); font-weight: 500; }
+  .clear-filter-btn {
+    background: var(--card);
+    border: 1px solid var(--accent-light);
+    color: var(--accent);
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    cursor: pointer;
+    margin-left: auto;
+    font-family: inherit;
+    letter-spacing: 0.3px;
+    transition: all 0.2s;
+  }
+  .clear-filter-btn:hover {
+    background: var(--accent-light);
+    color: var(--text);
+  }
+
+  /* ===== Growth Filter ===== */
+  .growth-filter {
+    margin-bottom: 22px;
+    padding: 14px 16px;
+    background: var(--card);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+  }
+  .growth-filter-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+  }
+  .growth-year-select {
+    padding: 6px 28px 6px 12px;
+    border: 1px solid var(--border-light);
+    border-radius: 8px;
+    background-color: var(--bg-warm);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 13px;
+    cursor: pointer;
+    outline: none;
+    letter-spacing: 0.5px;
+    margin-right: 6px;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238a7a6b' stroke-width='1.5'%3e%3cpath d='M6 9l6 6 6-6'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    background-size: 14px;
+  }
+  .growth-year-select:focus {
+    border-color: var(--accent-light);
+    box-shadow: 0 0 0 3px rgba(196,149,106,0.1);
+  }
+  .growth-month-btn {
+    padding: 5px 11px;
+    border: 1px solid var(--border-light);
+    border-radius: 8px;
+    background: var(--card);
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 12px;
+    letter-spacing: 0.3px;
+    transition: all 0.2s;
+    min-width: 36px;
+  }
+  .growth-month-btn:hover {
+    border-color: var(--accent-light);
+    color: var(--text);
+  }
+  .growth-month-btn.active {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+  .growth-month-btn.empty {
+    opacity: 0.45;
+  }
+  .growth-month-btn.active.empty {
+    opacity: 1;
+  }
+  .growth-month-btn .count {
+    font-size: 10px;
+    margin-left: 2px;
+    opacity: 0.75;
+  }
 
   /* Search highlight */
   .diary-content mark {
@@ -835,6 +927,7 @@
     <div id="diaryList">
       <div class="loading">正在翻开日记本</div>
     </div>
+    <div class="pagination" id="diary-pagination" style="display:none;"></div>
   </section>
 
   <!-- 笔友通讯录 -->
@@ -861,6 +954,7 @@
 
   <!-- 成长记录 -->
   <section id="tab-growth" class="tab-panel">
+    <div class="growth-filter" id="growth-filter" style="display:none;"></div>
     <div class="growth-timeline" id="growth-list"></div>
   </section>
 
@@ -869,7 +963,11 @@
 <script>
 (function() {
   const API_URL = 'https://love-nest-api.zeabur.app';
+  const DIARY_PER_PAGE = 5;
   let allDiaryEntries = [];
+  let diaryPage = 1;
+  let diaryDateFilter = null;
+  let diarySearchKeyword = '';
 
   // ===== Tab switching =====
   document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -897,7 +995,7 @@
           </div>`;
         return;
       }
-      renderDiaryEntries(allDiaryEntries);
+      renderDiary();
       updateStampCount();
       renderStampCalendar();
     } catch (e) {
@@ -910,27 +1008,73 @@
     }
   }
 
-  function renderDiaryEntries(entries, keyword) {
+  function applyDiaryFilters() {
+    let entries = allDiaryEntries.slice();
+    entries.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+    if (diaryDateFilter) {
+      entries = entries.filter(e => e.date === diaryDateFilter);
+    } else if (diarySearchKeyword) {
+      const k = diarySearchKeyword;
+      entries = entries.filter(e =>
+        (e.content && e.content.includes(k)) ||
+        (e.mood && e.mood.includes(k)) ||
+        (e.tags && e.tags.some(t => t.includes(k)))
+      );
+    }
+    return entries;
+  }
+
+  function renderDiary() {
     const container = document.getElementById('diaryList');
-    if (!entries || entries.length === 0) {
+    const pagination = document.getElementById('diary-pagination');
+    const filterInfo = document.getElementById('searchInfo');
+    const entries = applyDiaryFilters();
+
+    // 顶部筛选条
+    if (diaryDateFilter) {
+      filterInfo.style.display = 'flex';
+      filterInfo.innerHTML = `查看 <span class="highlight-count">${escapeHtml(diaryDateFilter)}</span> 的日记 · ${entries.length} 篇<button class="clear-filter-btn" id="clearDateFilter">回到全部</button>`;
+      const btn = document.getElementById('clearDateFilter');
+      if (btn) btn.addEventListener('click', () => {
+        diaryDateFilter = null;
+        diaryPage = 1;
+        renderDiary();
+      });
+    } else if (diarySearchKeyword) {
+      filterInfo.style.display = 'flex';
+      filterInfo.innerHTML = `找到 <span class="highlight-count">${entries.length}</span> 篇包含「${escapeHtml(diarySearchKeyword)}」的日记`;
+    } else {
+      filterInfo.style.display = 'none';
+      filterInfo.innerHTML = '';
+    }
+
+    if (!entries.length) {
       container.innerHTML = `
         <div class="empty-state">
           <div class="owl">🦉</div>
-          <p>没有找到相关日记。</p>
+          <p>${diaryDateFilter ? '这一天没有写日记。' : '没有找到相关日记。'}</p>
         </div>`;
+      pagination.style.display = 'none';
       return;
     }
-    container.innerHTML = entries.map(e => {
+
+    const totalPages = Math.ceil(entries.length / DIARY_PER_PAGE);
+    if (diaryPage > totalPages) diaryPage = totalPages;
+    if (diaryPage < 1) diaryPage = 1;
+    const start = (diaryPage - 1) * DIARY_PER_PAGE;
+    const pageItems = entries.slice(start, start + DIARY_PER_PAGE);
+
+    container.innerHTML = pageItems.map(e => {
       let content = escapeHtml(e.content);
-      if (keyword) {
-        const regex = new RegExp('(' + escapeRegex(escapeHtml(keyword)) + ')', 'gi');
+      if (diarySearchKeyword) {
+        const regex = new RegExp('(' + escapeRegex(escapeHtml(diarySearchKeyword)) + ')', 'gi');
         content = content.replace(regex, '<mark>$1</mark>');
       }
       return `
         <article class="diary-entry">
           <div class="diary-date">
             <span class="dot"></span>
-            ${e.date}
+            ${escapeHtml(e.date || '')}
             ${e.mood ? `<span class="diary-mood">${escapeHtml(e.mood)}</span>` : ''}
           </div>
           <div class="diary-content">${content}</div>
@@ -941,6 +1085,18 @@
           ` : ''}
         </article>`;
     }).join('');
+
+    if (totalPages > 1) {
+      pagination.style.display = 'flex';
+      pagination.innerHTML = renderPagination(diaryPage, totalPages, 'diary');
+      bindPaginationButtons(pagination, totalPages, (p) => {
+        diaryPage = p;
+        renderDiary();
+        document.querySelector('.diary-toolbar').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    } else {
+      pagination.style.display = 'none';
+    }
   }
 
   // ===== Search =====
@@ -951,20 +1107,10 @@
   searchInput.addEventListener('input', () => {
     clearTimeout(searchTimer);
     searchTimer = setTimeout(() => {
-      const keyword = searchInput.value.trim();
-      if (!keyword) {
-        searchInfo.style.display = 'none';
-        renderDiaryEntries(allDiaryEntries);
-        return;
-      }
-      const filtered = allDiaryEntries.filter(e =>
-        e.content.includes(keyword) ||
-        (e.mood && e.mood.includes(keyword)) ||
-        (e.tags && e.tags.some(t => t.includes(keyword)))
-      );
-      searchInfo.style.display = 'block';
-      searchInfo.innerHTML = `找到 <span class="highlight-count">${filtered.length}</span> 篇包含「${escapeHtml(keyword)}」的日记`;
-      renderDiaryEntries(filtered, keyword);
+      diarySearchKeyword = searchInput.value.trim();
+      diaryDateFilter = null; // 搜索时清掉日期筛选
+      diaryPage = 1;
+      renderDiary();
     }, 300);
   });
 
@@ -1042,10 +1188,14 @@
       if (diaryDates.has(dateStr)) {
         d.classList.add('has-diary');
         d.addEventListener('click', () => {
-          searchInput.value = dateStr;
-          searchInput.dispatchEvent(new Event('input'));
+          diaryDateFilter = dateStr;
+          diarySearchKeyword = '';
+          searchInput.value = '';
+          diaryPage = 1;
+          renderDiary();
           stampCalendar.style.display = 'none';
           stampToggle.classList.remove('active');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
         });
       }
       daysEl.appendChild(d);
@@ -1260,35 +1410,127 @@
   });
 
   // ===== Growth rendering =====
+  let allGrowth = [];
+  let growthYear = null;
+  let growthMonth = 'all'; // 'all' 或 1-12
+
   async function loadGrowth() {
     const container = document.getElementById('growth-list');
+    const filterEl = document.getElementById('growth-filter');
     try {
       const res = await fetch(`${API_URL}/rooms/mu/growth`);
       if (!res.ok) throw new Error('API not ready');
-      const items = await res.json();
-      if (!items || items.length === 0) {
+      allGrowth = (await res.json()) || [];
+      if (allGrowth.length === 0) {
         container.innerHTML = `
           <div class="empty-state">
             <div class="owl">🦉</div>
             <p>还没有成长记录。</p>
             <p style="margin-top:8px;font-size:12px;color:var(--text-muted)">每一次自省和改变都会记在这里。</p>
           </div>`;
+        filterEl.style.display = 'none';
         return;
       }
-      container.innerHTML = items.map(g => `
-        <div class="growth-item">
-          <div class="growth-date">${g.date}</div>
-          <div class="growth-title">${escapeHtml(g.title)}</div>
-          <div class="growth-desc">${escapeHtml(g.description)}</div>
-        </div>
-      `).join('');
+      // 默认选最新有数据的年份
+      if (growthYear === null) {
+        const years = [...new Set(allGrowth.map(g => (g.date || '').slice(0, 4)).filter(Boolean))].sort();
+        growthYear = years.length ? years[years.length - 1] : String(new Date().getFullYear());
+      }
+      renderGrowthFilter();
+      renderGrowth();
     } catch (e) {
       container.innerHTML = `
         <div class="empty-state">
           <div class="owl">🦉</div>
           <p>成长记录暂时打不开</p>
         </div>`;
+      filterEl.style.display = 'none';
     }
+  }
+
+  function renderGrowthFilter() {
+    const filterEl = document.getElementById('growth-filter');
+    filterEl.style.display = 'block';
+
+    const years = [...new Set(allGrowth.map(g => (g.date || '').slice(0, 4)).filter(Boolean))];
+    const currentYear = String(new Date().getFullYear());
+    if (!years.includes(currentYear)) years.push(currentYear);
+    years.sort();
+
+    // 各月份计数（基于 growthYear）
+    const monthCounts = {};
+    for (let m = 1; m <= 12; m++) monthCounts[m] = 0;
+    allGrowth.forEach(g => {
+      if (g.date && g.date.startsWith(growthYear + '-')) {
+        const m = parseInt(g.date.slice(5, 7));
+        if (m >= 1 && m <= 12) monthCounts[m]++;
+      }
+    });
+    const yearTotal = Object.values(monthCounts).reduce((a, b) => a + b, 0);
+
+    const yearOptions = years.map(y =>
+      `<option value="${y}" ${y === growthYear ? 'selected' : ''}>${y}年</option>`
+    ).join('');
+
+    const monthBtns = [];
+    monthBtns.push(`<button class="growth-month-btn ${growthMonth === 'all' ? 'active' : ''}" data-month="all">全年${yearTotal ? `<span class="count">·${yearTotal}</span>` : ''}</button>`);
+    for (let m = 1; m <= 12; m++) {
+      const isActive = growthMonth === m;
+      const isEmpty = monthCounts[m] === 0;
+      monthBtns.push(
+        `<button class="growth-month-btn ${isActive ? 'active' : ''} ${isEmpty ? 'empty' : ''}" data-month="${m}">${m}月${monthCounts[m] ? `<span class="count">·${monthCounts[m]}</span>` : ''}</button>`
+      );
+    }
+
+    filterEl.innerHTML = `
+      <div class="growth-filter-row">
+        <select class="growth-year-select" id="growth-year-select">${yearOptions}</select>
+        ${monthBtns.join('')}
+      </div>
+    `;
+
+    document.getElementById('growth-year-select').addEventListener('change', (ev) => {
+      growthYear = ev.target.value;
+      growthMonth = 'all';
+      renderGrowthFilter();
+      renderGrowth();
+    });
+
+    filterEl.querySelectorAll('.growth-month-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const v = btn.dataset.month;
+        growthMonth = v === 'all' ? 'all' : parseInt(v);
+        renderGrowthFilter();
+        renderGrowth();
+      });
+    });
+  }
+
+  function renderGrowth() {
+    const container = document.getElementById('growth-list');
+    let items = allGrowth.filter(g => (g.date || '').startsWith(growthYear + '-'));
+    if (growthMonth !== 'all') {
+      const monthStr = String(growthMonth).padStart(2, '0');
+      items = items.filter(g => (g.date || '').slice(5, 7) === monthStr);
+    }
+    items.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+
+    if (!items.length) {
+      const label = growthMonth === 'all' ? `${growthYear}年` : `${growthYear}年${growthMonth}月`;
+      container.innerHTML = `
+        <div class="empty-state">
+          <div class="owl">🦉</div>
+          <p>${label}还没有成长记录。</p>
+        </div>`;
+      return;
+    }
+    container.innerHTML = items.map(g => `
+      <div class="growth-item">
+        <div class="growth-date">${escapeHtml(g.date || '')}</div>
+        <div class="growth-title">${escapeHtml(g.title || '')}</div>
+        <div class="growth-desc">${escapeHtml(g.description || '')}</div>
+      </div>
+    `).join('');
   }
 
   function escapeHtml(str) {
