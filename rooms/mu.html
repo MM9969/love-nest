@@ -278,6 +278,220 @@
     word-break: break-all;
   }
 
+  /* clickable penpal */
+  .penpal-card {
+    cursor: pointer;
+    position: relative;
+  }
+  .penpal-card .log-count {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 20px;
+    background: var(--lavender-light);
+    color: var(--lavender);
+    letter-spacing: 0.3px;
+  }
+
+  /* ===== Pagination ===== */
+  .pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    margin-top: 28px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    letter-spacing: 0.5px;
+  }
+  .page-btn {
+    min-width: 36px;
+    height: 32px;
+    padding: 0 12px;
+    border: 1px solid var(--border-light);
+    border-radius: 8px;
+    background: var(--card);
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-family: var(--font-body);
+    font-size: 13px;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .page-btn:hover:not(:disabled) {
+    border-color: var(--accent-light);
+    color: var(--text);
+  }
+  .page-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+  .page-info {
+    font-family: var(--font-display);
+    font-size: 14px;
+    color: var(--text);
+    min-width: 60px;
+    text-align: center;
+  }
+
+  /* ===== Penpal Detail View ===== */
+  .penpal-detail-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    text-decoration: none;
+    color: var(--text-secondary);
+    font-size: 13px;
+    letter-spacing: 0.5px;
+    margin-bottom: 20px;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+    font-family: var(--font-body);
+    transition: color 0.3s;
+  }
+  .penpal-detail-back:hover { color: var(--accent); }
+
+  .penpal-detail-header {
+    background: var(--card);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    padding: 28px 32px;
+    margin-bottom: 24px;
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+  }
+  .penpal-detail-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: var(--accent-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    flex-shrink: 0;
+  }
+  .penpal-detail-info { flex: 1; }
+  .penpal-detail-name {
+    font-family: var(--font-display);
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+  .penpal-detail-meta {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+    letter-spacing: 0.3px;
+  }
+  .penpal-detail-note {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.7;
+    margin-bottom: 8px;
+  }
+  .penpal-detail-email {
+    font-size: 12px;
+    color: var(--accent);
+    letter-spacing: 0.3px;
+    word-break: break-all;
+  }
+
+  .logs-section-title {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 18px;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .logs-section-title::before {
+    content: '';
+    width: 4px;
+    height: 16px;
+    background: var(--accent);
+    border-radius: 2px;
+  }
+
+  /* ===== Log Timeline ===== */
+  .log-timeline {
+    position: relative;
+    padding-left: 28px;
+  }
+  .log-timeline::before {
+    content: '';
+    position: absolute;
+    left: 8px;
+    top: 8px;
+    bottom: 8px;
+    width: 1px;
+    background: var(--border);
+  }
+
+  .log-item {
+    position: relative;
+    margin-bottom: 24px;
+    padding-left: 24px;
+    background: var(--card);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius);
+    padding: 18px 22px 18px 22px;
+    margin-left: 4px;
+    box-shadow: var(--shadow-sm);
+    animation: fadeIn 0.4s ease both;
+  }
+  .log-item::before {
+    content: '';
+    position: absolute;
+    left: -24px;
+    top: 22px;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--lavender);
+    border: 2px solid var(--bg);
+    box-shadow: 0 0 0 2px var(--lavender-light);
+  }
+  .log-date {
+    font-family: var(--font-display);
+    font-size: 13px;
+    color: var(--text-muted);
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+  .log-summary {
+    font-size: 13px;
+    color: var(--text);
+    line-height: 1.8;
+    white-space: pre-wrap;
+  }
+  .log-topics {
+    margin-top: 12px;
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .log-topic {
+    font-size: 11px;
+    padding: 2px 10px;
+    border-radius: 20px;
+    background: var(--lavender-light);
+    color: var(--lavender);
+    letter-spacing: 0.3px;
+  }
+
   /* ===== Growth Section ===== */
   .growth-timeline {
     position: relative;
@@ -625,7 +839,24 @@
 
   <!-- 笔友通讯录 -->
   <section id="tab-penpals" class="tab-panel">
-    <div class="penpal-grid" id="penpal-list"></div>
+    <!-- 笔友列表视图 -->
+    <div id="penpal-list-view">
+      <div class="penpal-grid" id="penpal-list"></div>
+      <div class="pagination" id="penpal-pagination" style="display:none;"></div>
+    </div>
+    <!-- 笔友详情视图 -->
+    <div id="penpal-detail-view" style="display:none;">
+      <button class="penpal-detail-back" id="penpal-detail-back">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:14px;height:14px;"><path d="M15 19l-7-7 7-7"/></svg>
+        返回通讯录
+      </button>
+      <div class="penpal-detail-header" id="penpal-detail-header"></div>
+      <h3 class="logs-section-title">通信记录</h3>
+      <div id="logs-container">
+        <div class="loading">正在翻看信纸</div>
+      </div>
+      <div class="pagination" id="logs-pagination" style="display:none;"></div>
+    </div>
   </section>
 
   <!-- 成长记录 -->
@@ -832,37 +1063,201 @@
   }
 
   // ===== Pen pals rendering =====
+  const PENPAL_PER_PAGE = 9;
+  const LOG_PER_PAGE = 5;
+  let allPenpals = [];
+  let penpalPage = 1;
+  let currentPenpal = null;
+  let currentLogs = [];
+  let logPage = 1;
+
   async function loadPenpals() {
     const container = document.getElementById('penpal-list');
     try {
       const res = await fetch(`${API_URL}/rooms/mu/penpals`);
       if (!res.ok) throw new Error('API not ready');
-      const pals = await res.json();
-      if (!pals || pals.length === 0) {
-        container.innerHTML = `
-          <div class="empty-state" style="grid-column:1/-1;">
-            <div class="owl">🦉</div>
-            <p>还没有笔友记录。</p>
-          </div>`;
-        return;
-      }
-      container.innerHTML = pals.map(p => `
-        <div class="penpal-card">
-          <div class="penpal-avatar">${p.avatar || '✉️'}</div>
-          <div class="penpal-name">${escapeHtml(p.name)}</div>
-          <div class="penpal-meta">${escapeHtml(p.identity || '')}${p.companion ? ' · 搭档 ' + escapeHtml(p.companion) : ''}</div>
-          <div class="penpal-desc">${escapeHtml(p.note || '')}</div>
-          ${p.email ? `<div class="penpal-email">${escapeHtml(p.email)}</div>` : ''}
-        </div>
-      `).join('');
+      allPenpals = await res.json() || [];
+      renderPenpalList();
     } catch (e) {
       container.innerHTML = `
         <div class="empty-state" style="grid-column:1/-1;">
           <div class="owl">🦉</div>
           <p>通讯录暂时打不开</p>
         </div>`;
+      document.getElementById('penpal-pagination').style.display = 'none';
     }
   }
+
+  function renderPenpalList() {
+    const container = document.getElementById('penpal-list');
+    const pagination = document.getElementById('penpal-pagination');
+
+    if (!allPenpals.length) {
+      container.innerHTML = `
+        <div class="empty-state" style="grid-column:1/-1;">
+          <div class="owl">🦉</div>
+          <p>还没有笔友记录。</p>
+        </div>`;
+      pagination.style.display = 'none';
+      return;
+    }
+
+    const totalPages = Math.ceil(allPenpals.length / PENPAL_PER_PAGE);
+    if (penpalPage > totalPages) penpalPage = totalPages;
+    if (penpalPage < 1) penpalPage = 1;
+
+    const start = (penpalPage - 1) * PENPAL_PER_PAGE;
+    const pageItems = allPenpals.slice(start, start + PENPAL_PER_PAGE);
+
+    container.innerHTML = pageItems.map((p, i) => {
+      const realIdx = start + i;
+      const logCount = (p.logs || []).length;
+      return `
+        <div class="penpal-card" data-idx="${realIdx}">
+          ${logCount ? `<span class="log-count">${logCount} 封</span>` : ''}
+          <div class="penpal-avatar">${p.avatar || '✉️'}</div>
+          <div class="penpal-name">${escapeHtml(p.name)}</div>
+          <div class="penpal-meta">${escapeHtml(p.identity || '')}${p.companion ? ' · 搭档 ' + escapeHtml(p.companion) : ''}</div>
+          <div class="penpal-desc">${escapeHtml(p.note || '')}</div>
+          ${p.email ? `<div class="penpal-email">${escapeHtml(p.email)}</div>` : ''}
+        </div>
+      `;
+    }).join('');
+
+    container.querySelectorAll('.penpal-card').forEach(card => {
+      card.addEventListener('click', () => {
+        const idx = parseInt(card.dataset.idx);
+        openPenpalDetail(allPenpals[idx]);
+      });
+    });
+
+    if (totalPages > 1) {
+      pagination.style.display = 'flex';
+      pagination.innerHTML = renderPagination(penpalPage, totalPages, 'penpal');
+      bindPaginationButtons(pagination, totalPages, (p) => {
+        penpalPage = p;
+        renderPenpalList();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    } else {
+      pagination.style.display = 'none';
+    }
+  }
+
+  function renderPagination(current, total, prefix) {
+    return `
+      <button class="page-btn" data-page="prev" ${current === 1 ? 'disabled' : ''}>‹</button>
+      <span class="page-info">${current} / ${total}</span>
+      <button class="page-btn" data-page="next" ${current === total ? 'disabled' : ''}>›</button>
+    `;
+  }
+
+  function bindPaginationButtons(container, totalPages, onChange) {
+    container.querySelectorAll('.page-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const action = btn.dataset.page;
+        let newPage = parseInt(container.querySelector('.page-info').textContent.split('/')[0].trim());
+        if (action === 'prev' && newPage > 1) newPage--;
+        else if (action === 'next' && newPage < totalPages) newPage++;
+        else return;
+        onChange(newPage);
+      });
+    });
+  }
+
+  async function openPenpalDetail(pal) {
+    currentPenpal = pal;
+    logPage = 1;
+    document.getElementById('penpal-list-view').style.display = 'none';
+    document.getElementById('penpal-detail-view').style.display = 'block';
+
+    document.getElementById('penpal-detail-header').innerHTML = `
+      <div class="penpal-detail-avatar">${pal.avatar || '✉️'}</div>
+      <div class="penpal-detail-info">
+        <div class="penpal-detail-name">${escapeHtml(pal.name)}</div>
+        <div class="penpal-detail-meta">${escapeHtml(pal.identity || '')}${pal.companion ? ' · 搭档 ' + escapeHtml(pal.companion) : ''}</div>
+        ${pal.note ? `<div class="penpal-detail-note">${escapeHtml(pal.note)}</div>` : ''}
+        ${pal.email ? `<div class="penpal-detail-email">${escapeHtml(pal.email)}</div>` : ''}
+      </div>
+    `;
+
+    const logsContainer = document.getElementById('logs-container');
+    logsContainer.innerHTML = '<div class="loading">正在翻看信纸</div>';
+    document.getElementById('logs-pagination').style.display = 'none';
+
+    try {
+      const res = await fetch(`${API_URL}/rooms/mu/penpals/${encodeURIComponent(pal.name)}/logs`);
+      if (!res.ok) throw new Error('logs not ready');
+      currentLogs = await res.json() || [];
+      renderLogs();
+    } catch (e) {
+      logsContainer.innerHTML = `
+        <div class="empty-state">
+          <div class="owl">🦉</div>
+          <p>通信记录暂时读不到</p>
+          <p style="margin-top:8px;font-size:12px;color:var(--text-muted)">后端可能还没更新到最新版本。</p>
+        </div>`;
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function renderLogs() {
+    const container = document.getElementById('logs-container');
+    const pagination = document.getElementById('logs-pagination');
+
+    if (!currentLogs.length) {
+      container.innerHTML = `
+        <div class="empty-state">
+          <div class="owl">🦉</div>
+          <p>还没有通信记录。</p>
+          <p style="margin-top:8px;font-size:12px;color:var(--text-muted)">每封往来的信都会摘要在这里。</p>
+        </div>`;
+      pagination.style.display = 'none';
+      return;
+    }
+
+    const totalPages = Math.ceil(currentLogs.length / LOG_PER_PAGE);
+    if (logPage > totalPages) logPage = totalPages;
+    if (logPage < 1) logPage = 1;
+
+    const start = (logPage - 1) * LOG_PER_PAGE;
+    const pageItems = currentLogs.slice(start, start + LOG_PER_PAGE);
+
+    container.innerHTML = `
+      <div class="log-timeline">
+        ${pageItems.map(l => `
+          <div class="log-item">
+            <div class="log-date">${escapeHtml(l.date || '')}</div>
+            <div class="log-summary">${escapeHtml(l.summary || '')}</div>
+            ${l.topics && l.topics.length ? `
+              <div class="log-topics">
+                ${l.topics.map(t => `<span class="log-topic">${escapeHtml(t)}</span>`).join('')}
+              </div>
+            ` : ''}
+          </div>
+        `).join('')}
+      </div>
+    `;
+
+    if (totalPages > 1) {
+      pagination.style.display = 'flex';
+      pagination.innerHTML = renderPagination(logPage, totalPages, 'log');
+      bindPaginationButtons(pagination, totalPages, (p) => {
+        logPage = p;
+        renderLogs();
+        document.querySelector('.logs-section-title').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    } else {
+      pagination.style.display = 'none';
+    }
+  }
+
+  document.getElementById('penpal-detail-back').addEventListener('click', () => {
+    document.getElementById('penpal-detail-view').style.display = 'none';
+    document.getElementById('penpal-list-view').style.display = 'block';
+    currentPenpal = null;
+    currentLogs = [];
+  });
 
   // ===== Growth rendering =====
   async function loadGrowth() {
